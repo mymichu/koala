@@ -1,0 +1,38 @@
+services:
+  database:
+    image: codenotary/immudb:latest
+    ports:
+      - 3322:3322 #GRPC
+      - 9497:9497 #TODO Metrics?
+      - 8080:8080 #HTTP
+      - 5432:5432 #TODO CLarify
+    networks:
+      - back-tier
+
+  worker:
+    image: koala-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # This is where VS Code should expect to find your project's source code and the value of "workspaceFolder" in .devcontainer/devcontainer.json
+      - ..:/workspace:cached
+    networks:
+      - back-tier
+    environment:
+      IMMUCLIENT_IMMUDB_ADDRESS: database
+      IMMUCLIENT_IMMUDB_PORT: 3322
+    
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+
+configs:
+  httpd-config:
+    external: true
+
+secrets:
+  server-certificate:
+    external: true
+
+networks:
+  back-tier: {}

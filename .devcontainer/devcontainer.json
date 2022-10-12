@@ -1,0 +1,42 @@
+{
+  "name": "[Optional] Your project name here",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "worker",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "dev",
+  "postCreateCommand": "cd backend && poetry config virtualenvs.in-project true && poetry update",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.linting.pylintEnabled": true,
+        "python.linting.mypyEnabled": true,
+        "python.linting.enabled": true,
+        "python.formatting.provider": "black",
+        "python.venvPath": "${workspaceFolder}/backend/.venv/",
+        "python.poetryPath": "poetry",
+        "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.cwd": "${workspaceFolder}/backend/tests",
+        "python.analysis.autoImportCompletions": true,
+        "editor.formatOnSave": true,
+        "python.linting.mypyArgs": [
+          "--config-file=backend/pyproject.toml"
+        ],
+        "python.linting.pylintArgs": [
+          "--rcfile=backend/pyproject.toml"
+        ]
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "GitHub.copilot",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "yzhang.markdown-all-in-one",
+        "bierner.markdown-mermaid",
+        "mongodb.mongodb-vscode"
+      ]
+    }
+  },
+  "workspaceFolder": "/workspace"
+}
