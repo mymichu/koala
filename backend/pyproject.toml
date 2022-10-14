@@ -60,6 +60,7 @@ line-length = 120
 
 [tool.poetry.scripts]
 my-script = "example.__main__:main"
+setupdb = "example.setup:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
