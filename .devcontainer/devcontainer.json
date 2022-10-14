@@ -27,15 +27,16 @@
         ]
       },
       "extensions": [
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "GitHub.copilot",
-        "mhutchie.git-graph",
-        "eamodio.gitlens",
-        "yzhang.markdown-all-in-one",
-        "bierner.markdown-mermaid",
-        "mongodb.mongodb-vscode"
-      ]
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"GitHub.copilot",
+		"mhutchie.git-graph",
+		"eamodio.gitlens",
+		"yzhang.markdown-all-in-one",
+		"bierner.markdown-mermaid",
+		"mongodb.mongodb-vscode",
+		"adpyke.vscode-sql-formatter"
+	]
     }
   },
   "workspaceFolder": "/workspace"
