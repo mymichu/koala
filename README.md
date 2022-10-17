@@ -8,6 +8,9 @@
 4. Show me all the changes of tool Y from a given time to a given time. 
 5. Show me all the changes of system A from a given time to a given time. 
 6. Show me all the changes end of life tools that are used by an SDE.
+7. Show all related documents to tool and system.
+8. Optional: Generate Reports out of information.
+9. All information system data classifications are within the database.
 ## Development tools
 immuclient login immudb - pw immudb
 
