@@ -1,5 +1,5 @@
 {
-  "name": "[Optional] Your project name here",
+  "name": "koala",
   "dockerComposeFile": "docker-compose.yml",
   "service": "worker",
   "shutdownAction": "stopCompose",
@@ -27,16 +27,16 @@
         ]
       },
       "extensions": [
-		"ms-python.python",
-		"ms-python.vscode-pylance",
-		"GitHub.copilot",
-		"mhutchie.git-graph",
-		"eamodio.gitlens",
-		"yzhang.markdown-all-in-one",
-		"bierner.markdown-mermaid",
-		"mongodb.mongodb-vscode",
-		"adpyke.vscode-sql-formatter"
-	]
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "GitHub.copilot",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "yzhang.markdown-all-in-one",
+        "bierner.markdown-mermaid",
+        "mongodb.mongodb-vscode",
+        "adpyke.vscode-sql-formatter"
+      ]
     }
   },
   "workspaceFolder": "/workspace"

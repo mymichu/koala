@@ -1,10 +1,13 @@
 from dataclasses import dataclass
-from datetime import date
-
 
 
 @dataclass
-class Tool:
+class ToolId:
     name: str
-    end_of_life: date
-    entry_date: date
+    major: int
+
+
+@dataclass
+class SystemId:
+    name: str
+    major: int

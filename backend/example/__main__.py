@@ -1,24 +1,35 @@
-import argparse
+from pydoc import cli
+from dependency_injector.wiring import Provide, inject
+from example.database.types import ToolId
+from immudb import ImmudbClient
+from dependency_injector import providers
 
-from .container import Container
+from example.container import Container
+from example.database.tool import Tool, System
+
+
+@inject
+def run(client: ImmudbClient = Provide[Container.client]) -> None:
+    client.login("immudb", "immudb", database="defaultdb")
+    gcc_compiler = Tool(client, ToolId("GCC", 9))
+    gcc_compiler.add_to_database("COMPILE FOR ARM")
+    clang_compiler = Tool(client, ToolId("clang", 10))
+    clang_compiler.add_to_database("COMPILE FOR X64")
+    system = System(client, "SYS1", 1)
+    system.add("System for embedded")
+    system.link_to_tool(gcc_compiler.tool_id)
+    system.link_to_tool(clang_compiler.tool_id)
+    print("--- all tool depend on SYS1 ---")
+    print(system.get_linked_tools())
+    print("--- all tool depend on GCC ---")
+    print(gcc_compiler.get_linked_systems())
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument(
-        "--dummy",
-        action="store_true",
-        help="Enable dummy mode helps for system test or development",
-        required=False,
-        default=False,
-    )
-
-    args = parser.parse_args()
-
     container = Container()
-    container.config.dummy.override(args.dummy)
     container.init_resources()
     container.wire(modules=[__name__])
+    run()
     # TODO
 
 

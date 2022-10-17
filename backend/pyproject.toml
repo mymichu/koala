@@ -59,7 +59,7 @@ profile = "black"
 line-length = 120
 
 [tool.poetry.scripts]
-my-script = "example.__main__:main"
+koala = "example.__main__:main"
 setupdb = "example.setup:main"
 queries = "example.alltools:main"
 
