@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "example"
+name = "koala"
 version = "0.1.0"
 description = ""
 authors = ["Michel Meyer <meyer_michel@outlook.com>"]
@@ -22,7 +22,7 @@ bandit = "1.7.4"
 pylint = "2.14.4"
 
 [tool.mypy]
-files = "example/**/*.py"
+files = "koala/**/*.py"
 allow_untyped_decorators = false
 warn_unused_configs = true
 allow_subclassing_any = false
@@ -59,9 +59,9 @@ profile = "black"
 line-length = 120
 
 [tool.poetry.scripts]
-koala = "example.__main__:main"
-setupdb = "example.setup:main"
-queries = "example.alltools:main"
+koala = "koala.__main__:main"
+setupdb = "koala.setup:main"
+queries = "koala.alltools:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,11 +1,11 @@
 from pydoc import cli
 from dependency_injector.wiring import Provide, inject
-from example.database.types import ToolId
+from koala.database.types import ToolId
 from immudb import ImmudbClient
 from dependency_injector import providers
 
-from example.container import Container
-from example.database.tool import Tool, System
+from koala.container import Container
+from koala.database.tool import Tool, System
 
 
 @inject

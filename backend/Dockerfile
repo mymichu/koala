@@ -4,5 +4,5 @@ COPY dist/*.whl /tmp/
 RUN pip install /tmp/*.whl
 CMD rm -rf /tmp/*.whl
 
-ENTRYPOINT ["python", "-m", "example"]
+ENTRYPOINT ["python", "-m", "koala"]
 

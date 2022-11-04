@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from example.database.types import SystemId, ToolId
+from koala.database.types import SystemId, ToolId
 from immudb import ImmudbClient
 from typing import List
 
