@@ -24,7 +24,7 @@ immuclient login immudb - pw immudb
 Instal docker compose to a running docker engine. Therefore execute the following commands:
 
 ```bash	
-curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-chmod +x ~/.docker/cli-plugins/docker-compose                                                                                                                                                               
-docker compose version 
+curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o docker-compose
+chmod +x docker-compose                                                                                                                                                               
+./docker-compose version 
 ```
