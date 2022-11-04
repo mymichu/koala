@@ -1,7 +1,7 @@
 from ast import alias
 from typing import List
 from dataclasses import dataclass
-from koala.database.entity import Tool as DatabaseTool
+from koala.database.entity import Tool as DatabaseTool, ToolID
 from koala.database.entity import System as DataBaseSystem
 from koala.database.monitor import Monitor as DataBaseMonitor
 
@@ -52,7 +52,11 @@ class Api:
         tool_database.add()
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
-        return []
+        system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
+        tools = map(lambda tool: Tool(tool.name, tool.version_major, tool.purpose), system_db.get_linked_tools())
+        return tools
 
     def link_tools_to_system(self, tools: List[Tool], system: System) -> None:
-        pass
+        system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
+        for tool in tools:
+            system_db.link_to_tool(ToolID(tool.name, tool.version_major, tool.purpose))
