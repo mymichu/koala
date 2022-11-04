@@ -31,8 +31,7 @@ def test_get_all_sdes_returns_none_when_empty(koala_api):
     assert koala_api.get_all_systems() == []
 
 
-def test_add_one_sde(setup_test_database):
-    koala_api = setup_test_database()
+def test_add_one_sde(koala_api):
     esw1 = System(name="eSW", version="1.0", purpose="building firmware")
     koala_api.add_system(esw1)
     all_sdes = koala_api.get_all_systems()
