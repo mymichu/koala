@@ -1,7 +1,6 @@
-from turtle import circle
 import pytest
 from immudb import ImmudbClient
-from koala.api import Api, System
+from koala.api import Api, System, Tool
 
 
 URL = "database:3322"
@@ -15,7 +14,7 @@ def koala_api():
     client = ImmudbClient(URL)
     client.login(USERNAME, PASSWORD)
     # Always make sure we start with a clean database
-    if "pytest" in client.databaseList():
+    if DATABASE.decode("ascii") in client.databaseList():
         client.unloadDatabase(DATABASE)
         client.deleteDatabase(DATABASE)
     client.createDatabase(DATABASE)
@@ -38,36 +37,32 @@ def test_add_one_sde(koala_api):
     assert set(all_sdes) == set(esw1)
 
 
-def test_add_two_sdes(setup_test_database):
-    client = setup_test_database()
+def test_add_two_sdes(koala_api):
     esw1 = System(name="eSW", version="1.0", purpose="building firmware")
     esw2 = System(name="eSW", version="2.0", purpose="building firmware")
-    add_sde(client, esw1)
-    add_sde(client, esw2)
-    all_sdes = get_all_sdes(client)
+    koala_api.add_system(esw1)
+    koala_api.add_system(esw2)
+    all_sdes = koala_api.get_all_systems()
     assert set(all_sdes) == set([esw1, esw2])
 
 
-def test_get_all_tools_return_none_when_emoty(setup_test_database):
-    client = setup_test_database()
-    assert get_all_tools(client) == None
+def test_get_all_tools_return_none_when_empty(koala_api):
+    assert koala_api.get_all_tools() == []
 
 
-def test_add_one_tool(setup_test_database):
-    client = setup_test_database()
+def test_add_one_tool(koala_api):
     gcc = Tool(name="gcc", version="14.0", purpose="compiler")
-    add_tool(client, gcc)
-    all_tools = get_all_tools(client)
+    koala_api.add_tool(gcc)
+    all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc])
 
 
-def test_add_two_tools(setup_test_database):
-    client = setup_test_database()
+def test_add_two_tools(koala_api):
     gcc = Tool(name="gcc", version="14.0", purpose="compiler")
     clang = Tool(name="clang", version="12.0", purpose="compiler")
-    add_tool(client, gcc)
-    add_tool(client, clang)
-    all_tools = get_all_tools(client)
+    koala_api.add_tool(gcc)
+    koala_api.add_tool(clang)
+    all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc, clang])
 
 
