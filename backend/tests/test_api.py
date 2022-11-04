@@ -38,11 +38,13 @@ def test_add_one_sde(koala_api):
     assert set(all_sdes) == set([esw1])
 
 
-def test_add_two_sdes(koala_api):
+def test_add_two_sdes_same_name_and_purpose_different_versions(koala_api):
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
     koala_api.add_system(esw1)
+
+    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
     koala_api.add_system(esw2)
+
     all_sdes = koala_api.get_all_systems()
     assert set(all_sdes) == set([esw1, esw2])
 
@@ -54,64 +56,79 @@ def test_get_all_tools_return_none_when_empty(koala_api):
 def test_add_one_tool(koala_api):
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     koala_api.add_tool(gcc)
+
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc])
 
 
 def test_add_one_tool_with_different_versions(koala_api):
     gcc10 = Tool(name="gcc", version_major=10, purpose="compiler")
-    gcc11 = Tool(name="gcc", version_major=11, purpose="compiler")
-    gcc12 = Tool(name="gcc", version_major=12, purpose="compiler")
-    gcc13 = Tool(name="gcc", version_major=13, purpose="compiler")
     koala_api.add_tool(gcc10)
+
+    gcc11 = Tool(name="gcc", version_major=11, purpose="compiler")
     koala_api.add_tool(gcc11)
+
+    gcc12 = Tool(name="gcc", version_major=12, purpose="compiler")
     koala_api.add_tool(gcc12)
+
+    gcc13 = Tool(name="gcc", version_major=13, purpose="compiler")
     koala_api.add_tool(gcc13)
+
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc10, gcc11, gcc12, gcc13])
 
 
 def test_add_one_tool_with_same_version_different_purposes(koala_api):
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
-    clang_target = Tool(name="clang", version_major=10, purpose="target compiler")
     koala_api.add_tool(clang_host)
+
+    clang_target = Tool(name="clang", version_major=10, purpose="target compiler")
     koala_api.add_tool(clang_target)
+
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([clang_host, clang_target])
 
 
 def test_add_one_tool_with_different_version_different_purposes(koala_api):
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
-    clang_target = Tool(name="clang", version_major=11, purpose="target compiler")
     koala_api.add_tool(clang_host)
+
+    clang_target = Tool(name="clang", version_major=11, purpose="target compiler")
     koala_api.add_tool(clang_target)
+
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([clang_host, clang_target])
 
 
 def test_add_two_tools(koala_api):
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    clang = Tool(name="clang", version_major=12, purpose="compiler")
     koala_api.add_tool(gcc)
+
+    clang = Tool(name="clang", version_major=12, purpose="compiler")
     koala_api.add_tool(clang)
+
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc, clang])
 
 
 def test_get_tools_with_given_name_when_one_tool_2_versions_and_purposes(koala_api):
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
-    clang_target = Tool(name="clang", version_major=11, purpose="target compiler")
     koala_api.add_tool(clang_host)
+
+    clang_target = Tool(name="clang", version_major=11, purpose="target compiler")
     koala_api.add_tool(clang_target)
+
     tools = koala_api.get_tools(name="clang")
     assert set(tools) == set([clang_host, clang_target])
 
 
 def test_get_tools_with_given_name_when_one_tool_1_versions_and_2_purposes(koala_api):
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
-    clang_target = Tool(name="clang", version_major=10, purpose="target compiler")
     koala_api.add_tool(clang_host)
+
+    clang_target = Tool(name="clang", version_major=10, purpose="target compiler")
     koala_api.add_tool(clang_target)
+
     tools = koala_api.get_tools(name="clang")
     assert set(tools) == set([clang_host, clang_target])
 
@@ -169,9 +186,6 @@ def test_get_all_tools_not_in_any_sde(koala_api):
     koala_api.add_tool(clang)
 
     koala_api.link_tools_to_system(tools=[gcc], system=esw1)
-
-    # tools = koala_api.get_tools_for_system(None)
-    # assert set(tools) == set([clang])
     pass
 
 
