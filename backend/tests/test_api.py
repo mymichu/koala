@@ -12,7 +12,6 @@ PASSWORD = "immudb"
 def koala_api(request):
     client = ImmudbClient(URL)
     client.login(USERNAME, PASSWORD)
-    print(f"ADAS {request.node.name}")
     database_name = request.node.name
     database_name = database_name.replace("_", "")
     database = DatabaseInitializer(client, database_name)
