@@ -31,15 +31,15 @@ def test_get_all_sdes_returns_none_when_empty(koala_api):
 
 
 def test_add_one_sde(koala_api):
-    esw1 = System(name="eSW", version="1.0", purpose="building firmware")
+    esw1 = System(name="eSW", version_major="1.0", purpose="building firmware")
     koala_api.add_system(esw1)
     all_sdes = koala_api.get_all_systems()
-    assert set(all_sdes) == set(esw1)
+    assert set(all_sdes) == set([esw1])
 
 
 def test_add_two_sdes(koala_api):
-    esw1 = System(name="eSW", version="1.0", purpose="building firmware")
-    esw2 = System(name="eSW", version="2.0", purpose="building firmware")
+    esw1 = System(name="eSW", version_major="1.0", purpose="building firmware")
+    esw2 = System(name="eSW", version_major="2.0", purpose="building firmware")
     koala_api.add_system(esw1)
     koala_api.add_system(esw2)
     all_sdes = koala_api.get_all_systems()
@@ -51,15 +51,15 @@ def test_get_all_tools_return_none_when_empty(koala_api):
 
 
 def test_add_one_tool(koala_api):
-    gcc = Tool(name="gcc", version="14.0", purpose="compiler")
+    gcc = Tool(name="gcc", version_major="14.0", purpose="compiler")
     koala_api.add_tool(gcc)
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc])
 
 
 def test_add_two_tools(koala_api):
-    gcc = Tool(name="gcc", version="14.0", purpose="compiler")
-    clang = Tool(name="clang", version="12.0", purpose="compiler")
+    gcc = Tool(name="gcc", version_major="14.0", purpose="compiler")
+    clang = Tool(name="clang", version_major="12.0", purpose="compiler")
     koala_api.add_tool(gcc)
     koala_api.add_tool(clang)
     all_tools = koala_api.get_all_tools()

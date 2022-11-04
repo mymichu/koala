@@ -2,14 +2,18 @@ from typing import List
 from dataclasses import dataclass
 
 
-@dataclass
-class System:
+@dataclass(unsafe_hash=True)
+class Entity:
     name: str
     version_major: int
     purpose: str
 
 
-class Tool:
+class System(Entity):
+    pass
+
+
+class Tool(Entity):
     pass
 
 
