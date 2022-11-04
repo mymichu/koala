@@ -3,18 +3,24 @@ from immudb import ImmudbClient
 from koala.api import Api, System
 
 
+URL = "database:3322"
+USERNAME = "immudb"
+PASSWORD = "immudb"
+DATABASE = b"pytest"
+
+
 @pytest.fixture
 def setup_test_database():
-    URL = "database:3322"
-    USERNAME = "immudb"
-    PASSWORD = "immudb"
-    DATABASE = "pytest"
     client = ImmudbClient(URL)
-    client.login(USERNAME, PASSWORD, DATABASE)
-    client.createDatabase(DATABASE)
+    client.login(USERNAME, PASSWORD)
+
+    if "pytest" not in client.databaseList():
+        client.createDatabase(DATABASE)
+    client.useDatabase(DATABASE)
     koala_api = Api(client)
     yield koala_api
     client.deleteDatabase(DATABASE)
+    client.logout()
 
 
 def test_get_all_sdes_returns_none_when_empty(setup_test_database):
