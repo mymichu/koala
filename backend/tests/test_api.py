@@ -1,3 +1,4 @@
+from turtle import circle
 import pytest
 from immudb import ImmudbClient
 from koala.api import Api, System
@@ -13,12 +14,15 @@ DATABASE = b"pytest"
 def setup_test_database():
     client = ImmudbClient(URL)
     client.login(USERNAME, PASSWORD)
-
-    if "pytest" not in client.databaseList():
-        client.createDatabase(DATABASE)
+    # Always make sure we start with a clean database
+    if "pytest" in client.databaseList():
+        client.unloadDatabase(DATABASE)
+        client.deleteDatabase(DATABASE)
+    client.createDatabase(DATABASE)
     client.useDatabase(DATABASE)
     koala_api = Api(client)
     yield koala_api
+    client.unloadDatabase(DATABASE)
     client.deleteDatabase(DATABASE)
     client.logout()
 
