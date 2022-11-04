@@ -1,7 +1,9 @@
 from ast import alias
 from typing import List
 from dataclasses import dataclass
-from koala.database.tool import Monitor, Tool as DatabaseTool, System as DataBaseSystem, Monitor as DataBaseMonitor
+from koala.database.entity import Tool as DatabaseTool
+from koala.database.entity import System as DataBaseSystem
+from koala.database.monitor import Monitor as DataBaseMonitor
 
 
 @dataclass(unsafe_hash=True)
@@ -24,7 +26,13 @@ class Api:
         self._client = client
 
     def get_all_systems(self) -> List[System]:
-        return []
+        monitor_database = DataBaseMonitor(self._client)
+        systems_database = monitor_database.get_all_systems()
+        systems: List[System] = []
+        for system_db in systems_database:
+            print(system_db)
+            systems.append(System(system_db.name, system_db.version_major, system_db.purpose))
+        return systems
 
     def add_system(self, system: System) -> None:
         system_database = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
@@ -32,14 +40,16 @@ class Api:
 
     def get_all_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
-        systemsDatabase = monitor_database.get_all_systems()
-        systems: List[System] = []
-        for system in systemsDatabase:
-            systems.append(System(system.name, system.version_major, system.purpose))
-        return systems
+        tool_database = monitor_database.get_all_tools()
+        tools: List[Tool] = []
+        for tool_db in tool_database:
+            print(tool_db)
+            tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose))
+        return tools
 
     def add_tool(self, tool: Tool) -> None:
-        pass
+        tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose)
+        tool_database.add()
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
         return []

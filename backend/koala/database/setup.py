@@ -56,25 +56,3 @@ class DatabaseInitializer:
         )
 
 
-# uuid_gcc = str(uuid4())
-# uuid_clang = str(uuid4())
-# uuid_system1 = str(uuid4())
-
-# resp = client.sqlExec(
-#    f"""
-#    BEGIN TRANSACTION;
-
-#    INSERT INTO entity (name, version, uuid, purpose, changed_at, is_system)
-#        VALUES ('GCC', '1.1.0', '{uuid_gcc}','Compiler for C/C++', NOW(), FALSE);
-#    INSERT INTO entity (name, version, uuid, purpose, changed_at, is_system)
-#       VALUES ('CLANG', '10.3.0','{uuid_clang}', 'Compiler for C/C++', NOW(), FALSE);
-#   INSERT INTO entity (name, version, uuid, purpose, changed_at, is_system)
-#       VALUES ('SYSTEM1', '1.2.0', '{uuid_system1}', 'Toolchain for embedded devices', NOW(), TRUE);
-#   INSERT INTO systemtool (system_id, tool_id, created_at)
-#       VALUES ('{uuid_system1}', '{uuid_clang}', NOW());
-#   INSERT INTO systemtool (system_id, tool_id, created_at)
-#       VALUES ('{uuid_system1}', '{uuid_gcc}', NOW());
-#
-#    COMMIT;
-# """
-# )
