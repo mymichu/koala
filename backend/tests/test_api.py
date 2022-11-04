@@ -1,28 +1,26 @@
 import pytest
 from immudb import ImmudbClient
 from koala.api import Api, System, Tool
-
+from koala.database.setup import DatabaseInitializer
 
 URL = "database:3322"
 USERNAME = "immudb"
 PASSWORD = "immudb"
-DATABASE = b"pytest"
+DATABASE = "pytest"
 
 
 @pytest.fixture(scope="module")
 def koala_api():
     client = ImmudbClient(URL)
     client.login(USERNAME, PASSWORD)
+    database = DatabaseInitializer(client, DATABASE)
     # Always make sure we start with a clean database
-    if DATABASE.decode("ascii") in client.databaseList():
-        client.unloadDatabase(DATABASE)
-        client.deleteDatabase(DATABASE)
-    client.createDatabase(DATABASE)
-    client.useDatabase(DATABASE)
+    database.delete()
+    database.create_and_use()
+    database.setup_tables()
     koala_api = Api(client)
     yield koala_api
-    client.unloadDatabase(DATABASE)
-    client.deleteDatabase(DATABASE)
+    database.delete()
     client.logout()
 
 
