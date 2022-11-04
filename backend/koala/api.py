@@ -54,7 +54,7 @@ class Api:
     def get_tools_for_system(self, system: System) -> List[Tool]:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
         tools = map(lambda tool: Tool(tool.name, tool.version_major, tool.purpose), system_db.get_linked_tools())
-        return tools
+        return list(tools)
 
     def link_tools_to_system(self, tools: List[Tool], system: System) -> None:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
