@@ -17,3 +17,14 @@ immuclient login immudb - pw immudb
 ## SQL
 
 ./immuclient query "SELECT peoplenow.id, peoplenow.name, peoplethen.purpose, peoplenow.purpose FROM tool BEFORE now() AS peoplethen INNER JOIN tool AS peoplenow ON peoplenow.id=peoplethen.id;"
+
+
+ ## Instal Docker-Compose without docker desktop on Ubuntu 20.04
+
+Instal docker compose to a running docker engine. Therefore execute the following commands:
+
+```bash	
+curl -SL https://github.com/docker/compose/releases/download/v2.12.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+chmod +x ~/.docker/cli-plugins/docker-compose                                                                                                                                                               
+docker compose version 
+```
