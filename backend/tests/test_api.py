@@ -6,7 +6,6 @@ from koala.database.setup import DatabaseInitializer
 URL = "database:3322"
 USERNAME = "immudb"
 PASSWORD = "immudb"
-DATABASE = "pytest7"
 
 
 @pytest.fixture(scope="function")
@@ -21,8 +20,8 @@ def koala_api(request):
     database.delete()
     database.create_and_use()
     database.setup_tables()
-    koala_api = Api(client)
-    yield koala_api
+    api = Api(client)
+    yield api
     database.delete()
     client.logout()
 
