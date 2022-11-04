@@ -98,6 +98,24 @@ def test_add_two_tools(koala_api):
     assert set(all_tools) == set([gcc, clang])
 
 
+def test_get_tools_with_given_name_when_one_tool_2_versions_and_purposes(koala_api):
+    clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
+    clang_target = Tool(name="clang", version_major=11, purpose="target compiler")
+    koala_api.add_tool(clang_host)
+    koala_api.add_tool(clang_target)
+    tools = koala_api.get_tools(name="clang")
+    assert set(tools) == set([clang_host, clang_target])
+
+
+def test_get_tools_with_given_name_when_one_tool_1_versions_and_2_purposes(koala_api):
+    clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
+    clang_target = Tool(name="clang", version_major=10, purpose="target compiler")
+    koala_api.add_tool(clang_host)
+    koala_api.add_tool(clang_target)
+    tools = koala_api.get_tools(name="clang")
+    assert set(tools) == set([clang_host, clang_target])
+
+
 def test_get_tool_for_system_when_empty(koala_api):
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     tools = koala_api.get_tools_for_system(esw1)

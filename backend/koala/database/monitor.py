@@ -23,3 +23,6 @@ class Monitor:
         """
         )
         return [ToolID(name, version_major, purpose) for (name, version_major, purpose) in resp]
+
+    def get_tools(self, name: str) -> List[ToolID]:
+        pass
