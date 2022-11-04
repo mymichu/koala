@@ -10,8 +10,8 @@ PASSWORD = "immudb"
 DATABASE = b"pytest"
 
 
-@pytest.fixture
-def setup_test_database():
+@pytest.fixture(scope="module")
+def koala_api():
     client = ImmudbClient(URL)
     client.login(USERNAME, PASSWORD)
     # Always make sure we start with a clean database
@@ -27,8 +27,7 @@ def setup_test_database():
     client.logout()
 
 
-def test_get_all_sdes_returns_none_when_empty(setup_test_database):
-    koala_api = setup_test_database()
+def test_get_all_sdes_returns_none_when_empty(koala_api):
     assert koala_api.get_all_systems() == []
 
 
