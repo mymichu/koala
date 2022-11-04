@@ -137,7 +137,7 @@ class Tool:
                 f"""
                 SELECT linker.tool_owner_name, linker.tool_owner_major_version, system.purpose 
                 FROM entitylinker AS linker
-                INNER JOIN entity AS system ON linker.tool_owner_name = system.name AND linker.tool_owner_major_version = system.version_major;
+                INNER JOIN entity AS system ON linker.tool_owner_name = system.name AND linker.tool_owner_major_version = system.version_major
                 WHERE linker.tool_name = '{self.name}' AND linker.tool_major_version = {self.version_major} AND valid = TRUE AND system.is_system=TRUE;
                 """
             )

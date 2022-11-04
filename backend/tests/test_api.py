@@ -83,6 +83,19 @@ def test_link_existing_tool_to_existing_sde(koala_api):
     assert set(tools) == set([gcc])
 
 
+def test_link_existing_sde_to_existing_tool(koala_api):
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+    project_x = System(name="project x", version_major=1, purpose="building firmware for project X")
+    koala_api.add_system(esw1)
+    koala_api.add_system(project_x)
+    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
+    koala_api.add_tool(gcc)
+    koala_api.link_tools_to_system(tools=[gcc], system=esw1)
+    koala_api.link_tools_to_system(tools=[gcc], system=project_x)
+    systems = koala_api.get_systems_for_tool(gcc)
+    assert set(systems) == set([esw1, project_x])
+
+
 def test_submit_change_for_given_user_and_given_tool():
     pass
 
