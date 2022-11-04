@@ -1,3 +1,4 @@
+from ast import alias
 from typing import List
 from dataclasses import dataclass
 from koala.database.tool import Tool as DatabaseTool, System as DataBaseSystem
@@ -26,8 +27,8 @@ class Api:
         return []
 
     def add_system(self, system: System) -> None:
-        system = DataBaseSystem(self._client, system.name, system.version_major)
-        system.add(system.purpose)
+        system_database = DataBaseSystem(self._client, system.name, system.version_major)
+        system_database.add(system.purpose)
 
     def get_all_tools(self) -> List[Tool]:
         return []
