@@ -6,14 +6,17 @@ from koala.database.setup import DatabaseInitializer
 URL = "database:3322"
 USERNAME = "immudb"
 PASSWORD = "immudb"
-DATABASE = "pytest2"
+DATABASE = "pytest7"
 
 
-@pytest.fixture(scope="module")
-def koala_api():
+@pytest.fixture(scope="function")
+def koala_api(request):
     client = ImmudbClient(URL)
     client.login(USERNAME, PASSWORD)
-    database = DatabaseInitializer(client, DATABASE)
+    print(f"ADAS {request.node.name}")
+    database_name = request.node.name
+    database_name = database_name.replace("_", "")
+    database = DatabaseInitializer(client, database_name)
     # Always make sure we start with a clean database
     database.delete()
     database.create_and_use()
@@ -29,16 +32,16 @@ def test_get_all_sdes_returns_none_when_empty(koala_api):
 
 
 def test_add_one_sde(koala_api):
-    pass
-    # esw1 = System(name="eSW", version_major="1.0", purpose="building firmware")
-    # koala_api.add_system(esw1)
-    # all_sdes = koala_api.get_all_systems()
-    # assert set(all_sdes) == set([esw1])
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+    koala_api.add_system(esw1)
+    all_sdes = koala_api.get_all_systems()
+    print(all_sdes)
+    assert set(all_sdes) == set([esw1])
 
 
 def test_add_two_sdes(koala_api):
-    esw1 = System(name="eSW", version_major="1.0", purpose="building firmware")
-    esw2 = System(name="eSW", version_major="2.0", purpose="building firmware")
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
     koala_api.add_system(esw1)
     koala_api.add_system(esw2)
     all_sdes = koala_api.get_all_systems()
@@ -50,15 +53,15 @@ def test_get_all_tools_return_none_when_empty(koala_api):
 
 
 def test_add_one_tool(koala_api):
-    gcc = Tool(name="gcc", version_major="14.0", purpose="compiler")
+    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     koala_api.add_tool(gcc)
     all_tools = koala_api.get_all_tools()
     assert set(all_tools) == set([gcc])
 
 
 def test_add_two_tools(koala_api):
-    gcc = Tool(name="gcc", version_major="14.0", purpose="compiler")
-    clang = Tool(name="clang", version_major="12.0", purpose="compiler")
+    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
+    clang = Tool(name="clang", version_major=12, purpose="compiler")
     koala_api.add_tool(gcc)
     koala_api.add_tool(clang)
     all_tools = koala_api.get_all_tools()
@@ -66,15 +69,15 @@ def test_add_two_tools(koala_api):
 
 
 def test_get_tool_for_system_when_empty(koala_api):
-    esw1 = System(name="eSW", version_major="1.0", purpose="building firmware")
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     tools = koala_api.get_tools_for_system(esw1)
     assert tools == []
 
 
 def test_link_existing_tool_to_existing_sde(koala_api):
-    esw1 = System(name="eSW", version_major="1.0", purpose="building firmware")
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     koala_api.add_system(esw1)
-    gcc = Tool(name="gcc", version_major="14.0", purpose="compiler")
+    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     koala_api.add_tool(gcc)
     koala_api.link_tools_to_system(tools=[gcc], system=esw1)
     tools = koala_api.get_tools_for_system(esw1)
