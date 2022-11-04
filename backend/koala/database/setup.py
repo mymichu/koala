@@ -54,5 +54,3 @@ class DatabaseInitializer:
                 PRIMARY KEY id
                 );"""
         )
-
-

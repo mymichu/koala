@@ -23,6 +23,7 @@ def koala_api(request):
     yield api
     database.delete()
     client.logout()
+    client.shutdown()
 
 
 def test_get_all_sdes_returns_none_when_empty(koala_api):
