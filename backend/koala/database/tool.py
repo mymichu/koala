@@ -35,6 +35,19 @@ class DataBaseEntity:
         return len(resp) == 1
 
 
+class Monitor:
+    def __init__(self, client: ImmudbClient) -> None:
+        self._client = client
+
+    def get_all_systems(self) -> List[Entity]:
+        resp = self._client.sqlQuery(
+            """
+        SELECT * FROM entity WHERE is_system = TRUE;
+        """
+        )
+        return [System(name, version_major, purpose) for name, version_major, purpose in resp]
+
+
 class Tool:
     def __init__(self, client, tool_id: ToolId) -> None:
         self._client = client
@@ -73,21 +86,31 @@ class Tool:
 
 
 class System:
-    def __init__(self, client, name: str, version_major: int) -> None:
+    def __init__(self, client, name: str, version_major: int, purpose) -> None:
         self._client = client
         self._entity = DataBaseEntity(client=client)
         self._name = name
         self._version_major = version_major
+        self._purpose = purpose
 
-    def add(self, purpose: str) -> None:
+    def add(self) -> None:
         self._entity.insert(
             Entity(
                 name=self._name,
                 version_major=self._version_major,
-                purpose=purpose,
+                purpose=self._purpose,
                 is_system=True,
             )
         )
+
+    def get_name(self) -> str:
+        return self._name
+
+    def get_version(self) -> int:
+        return self._version_major
+
+    def get_purpose(self) -> str:
+        return self._purpose
 
     def _in_database(self) -> bool:
         return self._entity.is_valid(self._name, self._version_major)
@@ -126,3 +149,7 @@ class System:
                 (name, major_version) = tool
                 valid_tools.append(ToolId(name=name, major=major_version))
         return valid_tools
+
+    name = property(get_name)
+    version_major = property(get_version)
+    purpose = property(get_purpose)

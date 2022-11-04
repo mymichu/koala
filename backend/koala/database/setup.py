@@ -8,7 +8,8 @@ class DatabaseInitializer:
         self._name = name
 
     def create_and_use(self) -> None:
-        self._client.createDatabase(str.encode(self._name))
+        if self._name not in self._client.databaseList():
+            self._client.createDatabase(str.encode(self._name))
         self._client.useDatabase(str.encode(self._name))
 
     def delete(self) -> None:

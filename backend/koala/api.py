@@ -1,7 +1,7 @@
 from ast import alias
 from typing import List
 from dataclasses import dataclass
-from koala.database.tool import Tool as DatabaseTool, System as DataBaseSystem
+from koala.database.tool import Monitor, Tool as DatabaseTool, System as DataBaseSystem, Monitor as DataBaseMonitor
 
 
 @dataclass(unsafe_hash=True)
@@ -27,11 +27,16 @@ class Api:
         return []
 
     def add_system(self, system: System) -> None:
-        system_database = DataBaseSystem(self._client, system.name, system.version_major)
-        system_database.add(system.purpose)
+        system_database = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
+        system_database.add()
 
     def get_all_tools(self) -> List[Tool]:
-        return []
+        monitor_database = DataBaseMonitor(self._client)
+        systemsDatabase = monitor_database.get_all_systems()
+        systems: List[System] = []
+        for system in systemsDatabase:
+            systems.append(System(system.name, system.version_major, system.purpose))
+        return systems
 
     def add_tool(self, tool: Tool) -> None:
         pass
