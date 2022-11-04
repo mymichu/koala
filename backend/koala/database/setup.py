@@ -40,7 +40,7 @@ class DatabaseInitializer:
                 purpose VARCHAR[64],
                 changed_at TIMESTAMP,
                 is_system BOOLEAN,
-                PRIMARY KEY (name,version_major)
+                PRIMARY KEY (name,version_major,purpose)
                 );"""
         )
 
