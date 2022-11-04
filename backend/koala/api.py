@@ -32,3 +32,9 @@ class Api:
 
     def add_tool(self, tool: Tool) -> None:
         pass
+
+    def get_tools_for_system(self, system: System) -> List[Tool]:
+        return []
+
+    def link_tools_to_system(self, tools: List[Tool], system: System) -> None:
+        pass
