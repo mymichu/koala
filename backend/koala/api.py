@@ -38,14 +38,23 @@ class Api:
         system_database = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
         system_database.add()
 
-    def get_all_tools(self) -> List[Tool]:
-        monitor_database = DataBaseMonitor(self._client)
-        tool_database = monitor_database.get_all_tools()
+    @staticmethod
+    def _convert_to_tool(tool_database: List[ToolID]) -> List[Tool]:
         tools: List[Tool] = []
         for tool_db in tool_database:
             print(tool_db)
             tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose))
         return tools
+
+    def get_all_tools(self) -> List[Tool]:
+        monitor_database = DataBaseMonitor(self._client)
+        tool_database = monitor_database.get_all_tools()
+        return self._convert_to_tool(tool_database)
+
+    def get_tools(self, name: str) -> List[Tool]:
+        monitor_database = DataBaseMonitor(self._client)
+        tool_database = monitor_database.get_tools(name)
+        return self._convert_to_tool(tool_database)
 
     def add_tool(self, tool: Tool) -> None:
         tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose)

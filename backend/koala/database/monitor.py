@@ -25,4 +25,10 @@ class Monitor:
         return [ToolID(name, version_major, purpose) for (name, version_major, purpose) in resp]
 
     def get_tools(self, name: str) -> List[ToolID]:
-        pass
+        resp = self._client.sqlQuery(
+            f"""
+        SELECT name, version_major, purpose FROM entity 
+        WHERE name = '{name}' AND is_system = FALSE;
+        """
+        )
+        return [ToolID(name, version_major, purpose) for (name, version_major, purpose) in resp]
