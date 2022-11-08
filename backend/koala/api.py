@@ -46,6 +46,14 @@ class Api:
             tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose))
         return tools
 
+    def get_all_gmp_relevant_tools(self) -> List[Tool]:
+        pass
+
+    def unlinked_tools(self) -> List[Tool]:
+        monitor_database = DataBaseMonitor(self._client)
+        tool_database = monitor_database.unlinked_tools()
+        return self._convert_to_tool(tool_database)
+
     def get_all_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.get_all_tools()

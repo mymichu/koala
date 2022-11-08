@@ -16,6 +16,9 @@ class Monitor:
         )
         return [SystemID(name, version_major, purpose) for (name, version_major, purpose) in resp]
 
+    def unlinked_tools(self) -> List[ToolID]:
+        return []
+
     def get_all_tools(self) -> List[ToolID]:
         resp = self._client.sqlQuery(
             """

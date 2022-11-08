@@ -186,11 +186,19 @@ def test_get_all_tools_not_in_any_sde(koala_api):
     koala_api.add_tool(clang)
 
     koala_api.link_tools_to_system(tools=[gcc], system=esw1)
-    pass
+    assert koala_api.unlinked_tools() == set([clang])
 
 
-def test_get_all_gmp_relevant_tools():
-    pass
+def test_get_all_gmp_relevant_tools(koala_api):
+    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
+    koala_api.add_tool(gcc)
+
+    clang = Tool(name="clang", version_major=13, purpose="compiler")
+    koala_api.add_tool(clang)
+
+    ide = Tool(name="ide", version_major=12, purpose="IDE", gmp=False)
+    koala_api.add_tool(ide)
+    assert koala_api.get_all_gmp_relevant_tools() == set([gcc, clang])
 
 
 def test_submit_change_for_given_user_and_given_tool():
