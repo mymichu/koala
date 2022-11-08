@@ -37,9 +37,9 @@ warn_return_any = true
 ignore_missing_imports = false
 pretty = true
 
-[tool.mypy.overrides]
-module = 'tests.*'
-ignore_errors = true
+[[tool.mypy.overrides]]
+module = 'immudb.*'
+ignore_missing_imports = true
 
 [tool.pylint.format]
 max-line-length = 120
