@@ -1,9 +1,12 @@
 import pytest
+import os
 from immudb import ImmudbClient
+
 from koala.api import Api, System, Tool
 from koala.database.setup import DatabaseInitializer
 
-URL = "database:3322"
+host = os.getenv("IMMUDB_HOST", "database")
+URL = f"{host}:3322"
 USERNAME = "immudb"
 PASSWORD = "immudb"
 

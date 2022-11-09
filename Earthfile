@@ -1,10 +1,33 @@
 VERSION 0.6
 
-build:
-    FROM DOCKERFILE .devcontainer
-    COPY backend /backend
-    WORKDIR /backend
-    RUN poetry config virtualenvs.in-project true && poetry update
+
+
+docker:
+    FROM fnndsc/python-poetry
+    COPY backend ./backend
+    WORKDIR ./backend
+    SAVE IMAGE backend:latest
+
+install:
+    FROM +docker
+    RUN poetry update
     RUN poetry install
-    RUN poetry run mypy
+
+check:
+    FROM +install
+    RUN poetry run isort . --check
+    RUN poetry run mypy .
+
+build:
+    FROM +check
     RUN poetry build
+
+test:
+    FROM +install
+    ENV IMMUDB_HOST="localhost"
+    COPY .devcontainer .devcontainer
+    WITH DOCKER --compose .devcontainer/docker-compose.yml \
+        --service database
+        RUN poetry run pytest
+    END
+   

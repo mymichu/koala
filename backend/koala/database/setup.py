@@ -1,5 +1,6 @@
-from immudb import ImmudbClient
 from uuid import uuid4
+
+from immudb import ImmudbClient
 
 
 class DatabaseInitializer:

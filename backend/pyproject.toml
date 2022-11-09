@@ -36,10 +36,12 @@ warn_unused_ignores = true
 warn_return_any = true
 ignore_missing_imports = false
 pretty = true
+exclude = "tests/*"
 
 [[tool.mypy.overrides]]
 module = 'immudb.*'
 ignore_missing_imports = true
+
 
 [tool.pylint.format]
 max-line-length = 120
@@ -57,11 +59,6 @@ profile = "black"
 
 [tool.black]
 line-length = 120
-
-[tool.poetry.scripts]
-koala = "koala.__main__:main"
-setupdb = "koala.setup:main"
-queries = "koala.alltools:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

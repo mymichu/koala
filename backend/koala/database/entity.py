@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+
 from immudb import ImmudbClient
 
 
@@ -88,7 +89,7 @@ class System(SystemID):
                 f"""
                 BEGIN TRANSACTION;
                 INSERT INTO  entitylinker(tool_owner_name, tool_ownerversion_major, tool_name, toolversion_major, valid, changed_at)
-                VALUES {self.name}, {self.version_major}, {tool.name},{tool.major}, FALSE, NOW()
+                VALUES {self.name}, {self.version_major}, {tool.name}, {tool.version_major}, FALSE, NOW()
                 COMMIT;
                  """
             )
@@ -104,9 +105,9 @@ class System(SystemID):
                 WHERE linker.tool_owner_name = '{self.name}' AND linker.tool_owner_major_version = {self.version_major} AND linker.valid = TRUE AND tool.is_system=FALSE;
                 """
             )
-            for tool in tools_linked:
-                (name, version, purpose) = tool
-                valid_tools.append(Tool(self._client, name=name, version_major=version, purpose=purpose))
+
+            for (tool_name, tool_version, tool_purpose) in tools_linked:
+                valid_tools.append(ToolID(name=tool_name, version_major=tool_version, purpose=tool_purpose))
         return valid_tools
 
 

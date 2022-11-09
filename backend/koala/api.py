@@ -1,8 +1,11 @@
-from ast import alias
-from typing import List
 from dataclasses import dataclass
-from koala.database.entity import Tool as DatabaseTool, ToolID, SystemID
+from typing import List
+
+from immudb import ImmudbClient
+
 from koala.database.entity import System as DataBaseSystem
+from koala.database.entity import Tool as DatabaseTool
+from koala.database.entity import ToolID
 from koala.database.monitor import Monitor as DataBaseMonitor
 
 
@@ -22,7 +25,7 @@ class Tool(Entity):
 
 
 class Api:
-    def __init__(self, client) -> None:
+    def __init__(self, client: ImmudbClient) -> None:
         self._client = client
 
     def get_all_systems(self) -> List[System]:
@@ -73,7 +76,7 @@ class Api:
         tools = map(lambda tool: Tool(tool.name, tool.version_major, tool.purpose), system_db.get_linked_tools())
         return list(tools)
 
-    def get_systems_for_tool(self, tool: Tool) -> List[Tool]:
+    def get_systems_for_tool(self, tool: Tool) -> List[System]:
         tool_db = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose)
         systems = map(
             lambda system: System(system.name, system.version_major, system.purpose), tool_db.get_linked_systems()
