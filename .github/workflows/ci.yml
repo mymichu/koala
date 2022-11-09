@@ -33,4 +33,4 @@ jobs:
     - name: Run build
       run: earthly --ci +build
     - name: Run integration test
-      run: earthly --ci +test
+      run: earthly --ci -P +test
