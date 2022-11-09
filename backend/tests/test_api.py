@@ -1,5 +1,6 @@
-import pytest
 import os
+
+import pytest
 from immudb import ImmudbClient
 
 from koala.api import Api, System, Tool
