@@ -241,12 +241,62 @@ def test_get_all_sdes_owned_by_given_user():
     pass
 
 
-def test_get_all_documents_for_given_tool():
-    pass
+def test_get_all_documents_for_given_tool(koala_api):
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+    koala_api.add_system(esw1)
+    clang = Tool(name="clang", version_major=13, purpose="compiler")
+    koala_api.add_tool(clang)
+    ide = Tool(name="ide", version_major=12, purpose="IDE")
+    koala_api.add_tool(ide)
+
+    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
+    koala_api.add_system(esw1)
+    gtest = Tool(name="gtest", version_major=13, purpose="compiler")
+    koala_api.add_tool(clang)
+    artifactory = Tool(name="artifactory", version_major=12, purpose="IDE")
+    koala_api.add_tool(ide)
+
+
+    koala_api.link_tools_to_system(tools=[clang, ide], system=esw1)
+    koala_api.link_tools_to_system(tools=[gtest, artifactory], system=esw2)
+
+    result = koala_api.get_documents(clang)
+    assert esw1 in result
+
+    result = koala_api.get_documents(ide)
+    assert esw1 in result
+
+    result = koala_api.get_documents(gtest)
+    assert esw2 in result
+
+    result = koala_api.get_documents(artifactory)
+    assert esw2 in result
 
 
 def test_get_all_documents_for_given_sde():
-    pass
+    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+    koala_api.add_system(esw1)
+    clang = Tool(name="clang", version_major=13, purpose="compiler")
+    koala_api.add_tool(clang)
+    ide = Tool(name="ide", version_major=12, purpose="IDE")
+    koala_api.add_tool(ide)
+
+    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
+    koala_api.add_system(esw1)
+    gtest = Tool(name="gtest", version_major=13, purpose="compiler")
+    koala_api.add_tool(clang)
+    artifactory = Tool(name="artifactory", version_major=12, purpose="IDE")
+    koala_api.add_tool(ide)
+
+
+    koala_api.link_tools_to_system(tools=[clang, ide], system=esw1)
+    koala_api.link_tools_to_system(tools=[gtest, artifactory], system=esw2)
+
+    result = koala_api.get_documents(esw1)
+    assert all(item in result for item in [clang, ide])
+
+    result = koala_api.get_documents(esw2)
+    assert all(item in result for item in [gtest, artifactory])
 
 
 def test_get_status_for_given_tool():
