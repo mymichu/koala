@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -46,8 +46,8 @@ class Api:
         system_database.add()
 
     @staticmethod
-    def _convert_to_tool(tool_database: List[ToolID]) -> List[Tool]:
-        tools: List[Tool] = []
+    def _convert_to(cls, tool_database: List[ToolID]) -> List[Any]:
+        tools: List[cls] = []
         for tool_db in tool_database:
             print(tool_db)
             tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))
@@ -56,27 +56,35 @@ class Api:
     def get_gmp_relevant_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.get_gmp_relevant_tools()
-        return self._convert_to_tool(tool_database)
+        return self._convert_to(Tool, tool_database)
 
     def get_non_gmp_relevant_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.get_non_gmp_relevant_tools()
-        return self._convert_to_tool(tool_database)
+        return self._convert_to(Tool, tool_database)
+
+    def get_documents(self, entity: Entity) -> List[Entity]:
+        monitor_database = DataBaseMonitor(self._client)
+        entity_database = monitor_database.get_documents(entity)
+        return self._convert_to(Entity, entity_database)
+
+    def get_all_gmp_relevant_tools(self) -> List[Tool]:
+        pass
 
     def unlinked_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.unlinked_tools()
-        return self._convert_to_tool(tool_database)
+        return self._convert_to(Tool, tool_database)
 
     def get_all_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.get_all_tools()
-        return self._convert_to_tool(tool_database)
+        return self._convert_to(Tool, tool_database)
 
     def get_tools(self, name: str) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.get_tools(name)
-        return self._convert_to_tool(tool_database)
+        return self._convert_to(Tool, tool_database)
 
     def add_tool(self, tool: Tool) -> None:
         tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
@@ -84,15 +92,13 @@ class Api:
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
-        tools = map(lambda tool: Tool(tool.name, tool.version_major, tool.purpose), system_db.get_linked_tools())
-        return list(tools)
+        tool_database = system_db.get_linked_tools()
+        return self._convert_to(Tool, tool_database)
 
     def get_systems_for_tool(self, tool: Tool) -> List[System]:
         tool_db = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose)
-        systems = map(
-            lambda system: System(system.name, system.version_major, system.purpose), tool_db.get_linked_systems()
-        )
-        return list(systems)
+        systems_database = tool_db.get_linked_systems()
+        return self._convert_to(System, systems_database)
 
     def link_tools_to_system(self, tools: List[Tool], system: System) -> None:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)

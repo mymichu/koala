@@ -3,11 +3,11 @@ from typing import List
 from immudb import ImmudbClient
 from typing import Any
 
-from .entity import SystemID, ToolID
+from .entity import Entity, SystemID, ToolID
 
 
-def _to_tools(response: Any) -> List[ToolID]:
-    return [SystemID(name, version_major, purpose) for (name, version_major, purpose) in resp]
+def _to_tools(cls, response: Any) -> List[Any]:
+    return [cls(name, version_major, purpose) for (name, version_major, purpose) in response]
 
 
 class Monitor:
@@ -20,7 +20,7 @@ class Monitor:
         SELECT name, version_major, purpose FROM entity WHERE is_system = TRUE;
         """
         )
-        return _to_tools(resp)
+        return _to_tools(SystemID, resp)
 
     def unlinked_tools(self) -> List[ToolID]:
         resp = self._client.sqlQuery(
@@ -38,7 +38,7 @@ class Monitor:
         SELECT name, version_major, purpose FROM entity WHERE is_system = FALSE;
         """
         )
-        return _to_tools(resp)
+        return _to_tools(ToolID, resp)
 
     def get_tools(self, name: str) -> List[ToolID]:
         resp = self._client.sqlQuery(
@@ -47,9 +47,7 @@ class Monitor:
         WHERE name = '{name}' AND is_system = FALSE;
         """
         )
-        return [
-            ToolID(name, version_major, purpose, gmp_relevant) for (name, version_major, purpose, gmp_relevant) in resp
-        ]
+        return _to_tools(ToolID, resp)
 
     def get_gmp_relevant_tools(self) -> List[ToolID]:
         resp = self._client.sqlQuery(
@@ -58,7 +56,7 @@ class Monitor:
         WHERE gmp_relevant = TRUE AND is_system = FALSE;
         """
         )
-        return [ToolID(name, version_major, purpose, gmp_relevant=True) for (name, version_major, purpose) in resp]
+        return _to_tools(ToolID, resp)
 
     def get_non_gmp_relevant_tools(self) -> List[ToolID]:
         resp = self._client.sqlQuery(
@@ -67,4 +65,12 @@ class Monitor:
         WHERE gmp_relevant = FALSE AND is_system = FALSE;
         """
         )
-        return [ToolID(name, version_major, purpose, gmp_relevant=False) for (name, version_major, purpose) in resp]
+        return _to_tools(ToolID, resp)
+
+    def get_documents(self, entity: Any) -> List[Entity]:
+        resp = self._client.sqlQuery(
+            """
+            SELECT * FROM entity
+            """
+        )
+        return _to_tools(Entity, resp)
