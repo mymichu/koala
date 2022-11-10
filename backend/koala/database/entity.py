@@ -30,7 +30,7 @@ class DataBaseEntity:
         self._client.sqlExec(
             f"""
         BEGIN TRANSACTION;
-            INSERT INTO entity (name, version_major, purpose, changed_at, is_system) 
+            INSERT INTO entity (name, version_major, purpose, changed_at, is_system)
             VALUES ('{entiy.name}', {entiy.version_major},'{entiy.purpose}', NOW(), {entiy.is_system });
         COMMIT;
         """
@@ -77,7 +77,7 @@ class System(SystemID):
             self._client.sqlExec(
                 f"""
                 BEGIN TRANSACTION;
-                INSERT INTO  entitylinker(tool_owner_name, tool_owner_major_version, tool_name, tool_major_version, valid, changed_at)
+                INSERT INTO  entitylinker(system_name, system_major_version, tool_name, tool_major_version, valid, changed_at)
                 VALUES ('{self.name}', {self.version_major}, '{tool.name}',{tool.version_major}, TRUE, NOW());
                 COMMIT;
                  """
@@ -88,7 +88,7 @@ class System(SystemID):
             self._client.sqlExec(
                 f"""
                 BEGIN TRANSACTION;
-                INSERT INTO  entitylinker(tool_owner_name, tool_ownerversion_major, tool_name, toolversion_major, valid, changed_at)
+                INSERT INTO  entitylinker(system_name, tool_ownerversion_major, tool_name, toolversion_major, valid, changed_at)
                 VALUES {self.name}, {self.version_major}, {tool.name}, {tool.version_major}, FALSE, NOW()
                 COMMIT;
                  """
@@ -102,7 +102,7 @@ class System(SystemID):
                 SELECT linker.tool_name, linker.tool_major_version, tool.purpose
                 FROM entitylinker AS linker
                 INNER JOIN entity AS tool ON linker.tool_name = tool.name AND linker.tool_major_version = tool.version_major
-                WHERE linker.tool_owner_name = '{self.name}' AND linker.tool_owner_major_version = {self.version_major} AND linker.valid = TRUE AND tool.is_system=FALSE;
+                WHERE linker.system_name = '{self.name}' AND linker.system_major_version = {self.version_major} AND linker.valid = TRUE AND tool.is_system=FALSE;
                 """
             )
 
@@ -136,15 +136,15 @@ class Tool:
         if self._in_database():
             tools_linked = self._client.sqlQuery(
                 f"""
-                SELECT linker.tool_owner_name, linker.tool_owner_major_version, system.purpose 
+                SELECT linker.system_name, linker.system_major_version, system.purpose
                 FROM entitylinker AS linker
-                INNER JOIN entity AS system ON linker.tool_owner_name = system.name AND linker.tool_owner_major_version = system.version_major
+                INNER JOIN entity AS system ON linker.system_name = system.name AND linker.system_major_version = system.version_major
                 WHERE linker.tool_name = '{self.name}' AND linker.tool_major_version = {self.version_major} AND valid = TRUE AND system.is_system=TRUE;
                 """
             )
             for tool in tools_linked:
-                (tool_owner_name, tool_owner_major_version, purpose) = tool
+                (system_name, system_major_version, purpose) = tool
                 valid_systems.append(
-                    System(self._client, name=tool_owner_name, version_major=tool_owner_major_version, purpose=purpose)
+                    System(self._client, name=system_name, version_major=system_major_version, purpose=purpose)
                 )
         return valid_systems
