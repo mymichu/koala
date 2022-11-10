@@ -21,12 +21,12 @@ class DatabaseInitializer:
 
     def setup_tables(self) -> None:
         self._client.sqlExec(
-            """ 
-            CREATE TABLE IF NOT EXISTS entitylinker ( 
+            """
+            CREATE TABLE IF NOT EXISTS entitylinker (
             id INTEGER AUTO_INCREMENT,
-            tool_owner_name VARCHAR[128], 
-            tool_owner_major_version INTEGER,
-            tool_name VARCHAR[128], 
+            system_name VARCHAR[128],
+            system_major_version INTEGER,
+            tool_name VARCHAR[128],
             tool_major_version INTEGER,
             valid BOOLEAN,
             changed_at TIMESTAMP,
