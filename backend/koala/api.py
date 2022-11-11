@@ -5,7 +5,7 @@ from immudb import ImmudbClient
 
 from koala.database.entity import System as DataBaseSystem
 from koala.database.entity import Tool as DatabaseTool
-from koala.database.entity import ToolID
+from koala.database.entity import ToolID, SystemID
 from koala.database.monitor import Monitor as DataBaseMonitor
 
 
@@ -49,9 +49,16 @@ class Api:
     def _convert_to(cls, tool_database: List[ToolID]) -> List[Any]:
         tools: List[cls] = []
         for tool_db in tool_database:
-            print(tool_db)
-            tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))
+            if isinstance(tool_db, ToolID):
+                tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))
+            elif isinstance(tool_db, SystemID):
+                tools.append(System(tool_db.name, tool_db.version_major, tool_db.purpose))
+            else:
+                pass
+                # should panic ?
+
         return tools
+
 
     def get_gmp_relevant_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)

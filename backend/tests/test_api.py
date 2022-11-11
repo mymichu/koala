@@ -191,15 +191,10 @@ def test_get_all_tools_not_in_any_sde(koala_api):
     koala_api.add_tool(clang)
 
     koala_api.link_tools_to_system(tools=[gcc], system=esw1)
-    assert koala_api.unlinked_tools() == set([clang])
 
-
-def test_get_all_gmp_relevant_tools(koala_api):
-    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    koala_api.add_tool(gcc)
-
-    clang = Tool(name="clang", version_major=13, purpose="compiler")
-    koala_api.add_tool(clang)
+    result = koala_api.unlinked_tools()
+    assert len(result) == 1
+    assert set(result) == set([clang])
 
     ide = Tool(name="ide", version_major=12, purpose="IDE", gmp_relevant=False)
     koala_api.add_tool(ide)
@@ -259,20 +254,19 @@ def test_get_all_sdes_owned_by_given_user():
 
 
 def test_get_all_documents_for_given_tool(koala_api):
-    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+    esw1 = System(name="eSW1", version_major=1, purpose="building firmware")
     koala_api.add_system(esw1)
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     koala_api.add_tool(clang)
     ide = Tool(name="ide", version_major=12, purpose="IDE")
     koala_api.add_tool(ide)
 
-    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
-    koala_api.add_system(esw1)
+    esw2 = System(name="eSW2", version_major=2, purpose="building firmware")
+    koala_api.add_system(esw2)
     gtest = Tool(name="gtest", version_major=13, purpose="compiler")
-    koala_api.add_tool(clang)
+    koala_api.add_tool(gtest)
     artifactory = Tool(name="artifactory", version_major=12, purpose="IDE")
-    koala_api.add_tool(ide)
-
+    koala_api.add_tool(artifactory)
 
     koala_api.link_tools_to_system(tools=[clang, ide], system=esw1)
     koala_api.link_tools_to_system(tools=[gtest, artifactory], system=esw2)
@@ -290,21 +284,20 @@ def test_get_all_documents_for_given_tool(koala_api):
     assert esw2 in result
 
 
-def test_get_all_documents_for_given_sde():
-    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
+def test_get_all_documents_for_given_sde(koala_api):
+    esw1 = System(name="eSW1", version_major=1, purpose="building firmware")
     koala_api.add_system(esw1)
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     koala_api.add_tool(clang)
     ide = Tool(name="ide", version_major=12, purpose="IDE")
     koala_api.add_tool(ide)
 
-    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
-    koala_api.add_system(esw1)
+    esw2 = System(name="eSW2", version_major=2, purpose="building firmware")
+    koala_api.add_system(esw2)
     gtest = Tool(name="gtest", version_major=13, purpose="compiler")
-    koala_api.add_tool(clang)
+    koala_api.add_tool(gtest)
     artifactory = Tool(name="artifactory", version_major=12, purpose="IDE")
-    koala_api.add_tool(ide)
-
+    koala_api.add_tool(artifactory)
 
     koala_api.link_tools_to_system(tools=[clang, ide], system=esw1)
     koala_api.link_tools_to_system(tools=[gtest, artifactory], system=esw2)
