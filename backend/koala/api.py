@@ -21,7 +21,11 @@ class System(Entity):
 
 
 class Tool(Entity):
-    pass
+    gmp_relevant: bool = True
+
+    def __init__(self, name: str, version_major: int, purpose: str, gmp_relevant: bool = True) -> None:
+        super().__init__(name=name, version_major=version_major, purpose=purpose)
+        self.gmp_relevant = gmp_relevant
 
 
 class Api:
@@ -46,11 +50,18 @@ class Api:
         tools: List[Tool] = []
         for tool_db in tool_database:
             print(tool_db)
-            tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose))
+            tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))
         return tools
 
-    def get_all_gmp_relevant_tools(self) -> List[Tool]:
-        pass
+    def get_gmp_relevant_tools(self) -> List[Tool]:
+        monitor_database = DataBaseMonitor(self._client)
+        tool_database = monitor_database.get_gmp_relevant_tools()
+        return self._convert_to_tool(tool_database)
+
+    def get_non_gmp_relevant_tools(self) -> List[Tool]:
+        monitor_database = DataBaseMonitor(self._client)
+        tool_database = monitor_database.get_non_gmp_relevant_tools()
+        return self._convert_to_tool(tool_database)
 
     def unlinked_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
@@ -68,7 +79,7 @@ class Api:
         return self._convert_to_tool(tool_database)
 
     def add_tool(self, tool: Tool) -> None:
-        tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose)
+        tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
         tool_database.add()
 
     def get_tools_for_system(self, system: System) -> List[Tool]:

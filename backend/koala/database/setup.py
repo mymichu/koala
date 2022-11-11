@@ -15,6 +15,7 @@ class DatabaseInitializer:
 
     def delete(self) -> None:
         if self._name in self._client.databaseList():
+            print(f"Deleting database {self._name}")
             self._client.unloadDatabase(str.encode(self._name))
             self._client.deleteDatabase(str.encode(self._name))
 
@@ -41,6 +42,7 @@ class DatabaseInitializer:
                 purpose VARCHAR[64],
                 changed_at TIMESTAMP,
                 is_system BOOLEAN,
+                gmp_relevant BOOLEAN,
                 PRIMARY KEY (name,version_major,purpose)
                 );"""
         )

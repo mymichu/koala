@@ -7,6 +7,7 @@ from koala.api import Api, System, Tool
 from koala.database.setup import DatabaseInitializer
 
 host = os.getenv("IMMUDB_HOST", "database")
+print(f"DATABASE: {host}")
 URL = f"{host}:3322"
 USERNAME = "immudb"
 PASSWORD = "immudb"
@@ -200,9 +201,25 @@ def test_get_all_gmp_relevant_tools(koala_api):
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     koala_api.add_tool(clang)
 
-    ide = Tool(name="ide", version_major=12, purpose="IDE", gmp=False)
+    ide = Tool(name="ide", version_major=12, purpose="IDE", gmp_relevant=False)
     koala_api.add_tool(ide)
-    assert koala_api.get_all_gmp_relevant_tools() == set([gcc, clang])
+    relevant_gmp_tools = koala_api.get_gmp_relevant_tools()
+    assert len(relevant_gmp_tools) == 2
+    assert set(relevant_gmp_tools) == set([gcc, clang])
+
+
+def test_get_all_non_gmp_relevant_tools(koala_api):
+    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
+    koala_api.add_tool(gcc)
+
+    clang = Tool(name="clang", version_major=13, purpose="compiler")
+    koala_api.add_tool(clang)
+
+    ide = Tool(name="ide", version_major=12, purpose="IDE", gmp_relevant=False)
+    koala_api.add_tool(ide)
+    relevant_non_gmp_tools = koala_api.get_non_gmp_relevant_tools()
+    assert len(relevant_non_gmp_tools) == 1
+    assert set(relevant_non_gmp_tools) == set([ide])
 
 
 def test_submit_change_for_given_user_and_given_tool():

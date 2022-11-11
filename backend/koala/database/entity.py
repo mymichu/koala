@@ -10,6 +10,7 @@ class Entity:
     version_major: int
     purpose: str
     is_system: bool
+    gmp_relevant: bool = True
 
 
 @dataclass
@@ -30,8 +31,8 @@ class DataBaseEntity:
         self._client.sqlExec(
             f"""
         BEGIN TRANSACTION;
-            INSERT INTO entity (name, version_major, purpose, changed_at, is_system) 
-            VALUES ('{entiy.name}', {entiy.version_major},'{entiy.purpose}', NOW(), {entiy.is_system });
+            INSERT INTO entity (name, version_major, purpose, changed_at, is_system, gmp_relevant)
+            VALUES ('{entiy.name}', {entiy.version_major},'{entiy.purpose}', NOW(), {entiy.is_system }, {entiy.gmp_relevant});
         COMMIT;
         """
         )
@@ -45,6 +46,7 @@ class DataBaseEntity:
         return len(resp) == 1
 
 
+# All Systems are GMP relevant
 class System(SystemID):
     def __init__(self, client: ImmudbClient, name: str, version_major: int, purpose: str) -> None:
         super().__init__(name=name, version_major=version_major, purpose=purpose)
@@ -112,12 +114,15 @@ class System(SystemID):
 
 
 class Tool:
-    def __init__(self, client: ImmudbClient, name: str, version_major: int, purpose: str) -> None:
+    def __init__(
+        self, client: ImmudbClient, name: str, version_major: int, purpose: str, gmp_relevant: bool = True
+    ) -> None:
         self._client = client
         self._entity = DataBaseEntity(client=client)
         self.name = name
         self.version_major = version_major
         self.purpose = purpose
+        self.gmp_relevant = gmp_relevant
 
     def add(self) -> None:
         self._entity.insert(
@@ -125,6 +130,7 @@ class Tool:
                 name=self.name,
                 version_major=self.version_major,
                 purpose=self.purpose,
+                gmp_relevant=self.gmp_relevant,
             )
         )
 
