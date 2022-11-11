@@ -62,15 +62,6 @@ class System(SystemID):
             )
         )
 
-    def getname(self) -> str:
-        return self.name
-
-    def get_version(self) -> int:
-        return self.version_major
-
-    def getpurpose(self) -> str:
-        return self.purpose
-
     def _in_database(self) -> bool:
         return self._entity.is_valid(self.name, self.version_major)
 
