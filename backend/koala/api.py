@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, List, Union
 
 from immudb import ImmudbClient
 
@@ -59,13 +59,13 @@ class Api:
         pass
 
     @staticmethod
-    def _convert_to(cls, tool_database: List[ToolID]) -> List[Any]:
-        tools: List[cls] = []
+    def _convert_to(target_type, tool_database: Union[List[ToolID], List[SystemID]]) -> List[Any]:
+        tools: List[target_type] = []
         for tool_db in tool_database:
             if isinstance(tool_db, ToolID):
-                tools.append(Tool(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))
+                tools.append(target_type(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))
             elif isinstance(tool_db, SystemID):
-                tools.append(System(tool_db.name, tool_db.version_major, tool_db.purpose))
+                tools.append(target_type(tool_db.name, tool_db.version_major, tool_db.purpose))
             else:
                 pass
                 # should panic ?
@@ -82,10 +82,10 @@ class Api:
         tool_database = monitor_database.get_non_gmp_relevant_tools()
         return self._convert_to(Tool, tool_database)
 
-    def get_documents(self, entity: Entity) -> List[Entity]:
-        monitor_database = DataBaseMonitor(self._client)
-        entity_database = monitor_database.get_documents(entity)
-        return self._convert_to(Entity, entity_database)
+    #    def get_documents(self, entity: Entity) -> List[Entity]:
+    #        monitor_database = DataBaseMonitor(self._client)
+    #        entity_database = monitor_database.get_documents(entity)
+    #        return self._convert_to(Entity, entity_database)
 
     def get_all_gmp_relevant_tools(self) -> List[Tool]:
         pass

@@ -84,36 +84,39 @@ class Monitor:
         )
         return list(map(lambda x: ToolID(*x), resp))
 
-    def get_documents(self, entity: Any) -> List[Entity]:
-        entities = self._client.sqlQuery(
-            """
-            SELECT name, version_major, purpose, is_system FROM entity;
-            """
-        )
+    # def get_documents(self, entity: Any) -> List[Entity]:
+    #    entities = self._client.sqlQuery(
+    #        """
+    #        SELECT name, version_major, purpose, is_system FROM entity;
+    #        """
+    #    )
 
-        tool_links = self._client.sqlQuery(
-            f"""
-        SELECT tool_name, system_name FROM entitylinker
-        WHERE system_name = '{entity.name}';
-        """
-        )
 
-        system_links = self._client.sqlQuery(
-            f"""
-        SELECT system_name, tool_name FROM entitylinker
-        WHERE tool_name = '{entity.name}';
-        """
-        )
-
-        links = tool_links + system_links
-
-        entities = [entity for entity in entities if _in(links, entity)]
-
-        result = []
-        for name, version_major, purpose, is_system in entities:
-            if is_system:
-                result.append(SystemID(name, version_major, purpose))
-            else:
-                result.append(ToolID(name, version_major, purpose))
-
-        return result
+#
+#    tool_links = self._client.sqlQuery(
+#        f"""
+#    SELECT tool_name, system_name FROM entitylinker
+#    WHERE system_name = '{entity.name}';
+#    """
+#    )
+#
+#    system_links = self._client.sqlQuery(
+#        f"""
+#    SELECT system_name, tool_name FROM entitylinker
+#    WHERE tool_name = '{entity.name}';
+#    """
+#    )
+#
+#    links = tool_links + system_links
+#
+#    entities = [entity for entity in entities if _in(links, entity)]
+#
+#    result = []
+#    for name, version_major, purpose, is_system in entities:
+#        if is_system:
+#            result.append(SystemID(name, version_major, purpose))
+#        else:
+#            result.append(ToolID(name, version_major, purpose))
+#
+#    return result
+#
