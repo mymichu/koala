@@ -11,6 +11,12 @@ from koala.database.monitor import Monitor as DataBaseMonitor
 
 
 @dataclass(unsafe_hash=True)
+class Document:
+    name: str
+    path: str
+
+
+@dataclass(unsafe_hash=True)
 class Entity:
     name: str
     version_major: int
@@ -46,6 +52,12 @@ class Api:
         system_database = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
         system_database.add()
 
+    def add_system_document(self, system: System, document: Document) -> None:
+        pass
+
+    def get_system_documents(self, system: System) -> List[Document]:
+        pass
+
     @staticmethod
     def _convert_to(cls, tool_database: List[ToolID]) -> List[Any]:
         tools: List[cls] = []
@@ -59,7 +71,6 @@ class Api:
                 # should panic ?
 
         return tools
-
 
     def get_gmp_relevant_tools(self) -> List[Tool]:
         monitor_database = DataBaseMonitor(self._client)
@@ -97,6 +108,12 @@ class Api:
     def add_tool(self, tool: Tool) -> None:
         tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
         tool_database.add()
+
+    def add_tool_document(self, tool: Tool, document: Document) -> None:
+        pass
+
+    def get_tool_documents(self, tool: Tool) -> List[Document]:
+        pass
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
