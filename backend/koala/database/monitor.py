@@ -1,8 +1,7 @@
 from json import tool
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
-from typing import Any
 
 from .entity import Entity, SystemID, ToolID
 

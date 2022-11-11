@@ -4,8 +4,9 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 from koala.database.entity import System as DataBaseSystem
+from koala.database.entity import SystemID
 from koala.database.entity import Tool as DatabaseTool
-from koala.database.entity import ToolID, SystemID
+from koala.database.entity import ToolID
 from koala.database.monitor import Monitor as DataBaseMonitor
 
 
