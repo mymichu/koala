@@ -3,15 +3,20 @@ from typing import Any, List, Union
 
 from immudb import ImmudbClient
 
-from koala.database.entity import System as DataBaseSystem
-from koala.database.entity import SystemID
-from koala.database.entity import Tool as DatabaseTool
-from koala.database.entity import ToolID
+from koala.database.model import (
+    SystemID,
+    ToolID,
+    document,
+    link_system_to_tool,
+    link_docs_to_entity,
+    System as DataBaseSystem,
+    Tool as DatabaseTool,
+    Document as DatabaseDocument,
+    LinkDocEntity as DatabaseLinkDocEntity,
+    LinkSystemTool as DatabaseLinkSystemTool,
+)
+
 from koala.database.monitor import Monitor as DataBaseMonitor
-from koala.database.model import Document as DatabaseDocument
-from koala.database.model import document
-from koala.database.model import LinkDocEntity as DatabaseLinkDocEntity
-from koala.database.model import link_docs_to_entity
 
 
 @dataclass(unsafe_hash=True)
@@ -67,17 +72,10 @@ class Api:
         document_database.add()
 
     def get_document(self, **kwargs) -> List[Document]:
-        return [
-            Document(db_doc.name, db_doc.path)
-            for db_doc in document.get_by(self._client, **kwargs)
-        ]
+        return [Document(db_doc.name, db_doc.path) for db_doc in document.get_by(self._client, **kwargs)]
 
     def add_link_doc_entity(self, link: LinkDocEntity) -> None:
-        link_database = DatabaseLinkDocEntity(
-            self._client,
-            link.document_id,
-            link.entity_id
-        )
+        link_database = DatabaseLinkDocEntity(self._client, link.document_id, link.entity_id)
         link_database.add()
 
     def get_link_doc_entity(self, **kwargs) -> List[LinkDocEntity]:
@@ -146,15 +144,17 @@ class Api:
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
-        tool_database = system_db.get_linked_tools()
+        tool_database = link_system_to_tool.get_linked_tools(self._client, system_db)
         return self._convert_to(Tool, tool_database)
 
     def get_systems_for_tool(self, tool: Tool) -> List[System]:
         tool_db = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose)
-        systems_database = tool_db.get_linked_systems()
+        systems_database = link_system_to_tool.get_linked_systems(self._client, tool_db)
         return self._convert_to(System, systems_database)
 
     def link_tools_to_system(self, tools: List[Tool], system: System) -> None:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
         for tool in tools:
-            system_db.link_to_tool(ToolID(tool.name, tool.version_major, tool.purpose))
+            tool_db = ToolID(tool.name, tool.version_major, tool.purpose)
+            link = DatabaseLinkSystemTool(self._client, system_db, tool_db)
+            link.add()

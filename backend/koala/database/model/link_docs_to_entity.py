@@ -19,7 +19,7 @@ class LinkDocEntity(LinkDocEntityID):
         self._client.sqlExec(
             f"""
         BEGIN TRANSACTION;
-            INSERT INTO entity_x_document (document_id, entity_id, creation_date)
+            INSERT INTO entity_x_document(document_id, entity_id, creation_date)
             VALUES ({self.document_id}, {self.entity_id}, NOW());
         COMMIT;
         """

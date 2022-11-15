@@ -1,9 +1,8 @@
-from json import tool
-from typing import Any, List
+from typing import List
 
 from immudb import ImmudbClient
 
-from .entity import Entity, SystemID, ToolID
+from .model import SystemID, ToolID
 
 
 def _in(entitylinker: tuple, entity: tuple) -> bool:
