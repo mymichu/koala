@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 from immudb import ImmudbClient
 
 from . import Entity, DataBaseEntity
@@ -24,3 +25,20 @@ class System(SystemID):
                 purpose=self.purpose,
             )
         )
+
+
+def get_by(client: ImmudbClient, **kwargs) -> List[SystemID]:
+    query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
+    sep = " WHERE "
+
+    for key, value in kwargs.items():
+        if isinstance(value, str):
+            condition = f"{sep}{key}='{value}'"
+        else:
+            condition = f"{sep}{key}={value}"
+
+        sep = " AND "
+        query += condition
+
+    resp = client.sqlQuery(query)
+    return [SystemID(*item) for item in resp]

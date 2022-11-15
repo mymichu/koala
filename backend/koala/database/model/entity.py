@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 from immudb import ImmudbClient
 
@@ -10,6 +11,8 @@ class Entity:
     purpose: str
     is_system: bool
     gmp_relevant: bool = True
+    change_at: datetime = None
+    id: int = 0
 
 
 class DataBaseEntity:

@@ -6,7 +6,9 @@ from immudb import ImmudbClient
 from koala.database.model import (
     SystemID,
     ToolID,
-    document,
+    system as SystemDB,
+    tool as ToolDB,
+    document as DocumentDB,
     link_system_to_tool,
     link_docs_to_entity,
     System as DataBaseSystem,
@@ -71,9 +73,6 @@ class Api:
         document_database = DatabaseDocument(self._client, document.name, document.path)
         document_database.add()
 
-    def get_document(self, **kwargs: Dict[str, Any]) -> List[Document]:
-        return [Document(db_doc.name, db_doc.path) for db_doc in document.get_by(self._client, **kwargs)]
-
     def add_link_doc_entity(self, link: LinkDocEntity) -> None:
         link_database = DatabaseLinkDocEntity(self._client, link.document_id, link.entity_id)
         link_database.add()
@@ -85,10 +84,86 @@ class Api:
         ]
 
     def add_system_document(self, system: System, document: Document) -> None:
-        pass
+        doc_db = DocumentDB.get_by(
+            self._client,
+            name=document.name,
+            path=document.path,
+        )
+        sys_db = SystemDB.get_by(
+            self._client,
+            name=system.name,
+            version_major=system.version_major,
+            purpose=system.purpose,
+        )
+
+        if len(sys_db) != 1:
+            raise Exception("Ambigious system")
+
+        if len(doc_db) != 1:
+            raise Exception("Ambigious document")
+
+        link = DatabaseLinkDocEntity(
+            self._client,
+            doc_db[0].id,
+            sys_db[0].id,
+        )
+        link.add()
 
     def get_system_documents(self, system: System) -> List[Document]:
-        pass
+        sys_db = SystemDB.get_by(
+            self._client,
+            name=system.name,
+            version_major=system.version_major,
+            purpose=system.purpose,
+        )
+
+        if len(sys_db) != 1:
+            raise Exception("Ambigious system")
+
+        docs_db = link_docs_to_entity.get_linked_to_systems(self._client, sys_db[0])
+
+        return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
+
+    def add_tool_document(self, tool: Tool, document: Document) -> None:
+        doc_db = DocumentDB.get_by(
+            self._client,
+            name=document.name,
+            path=document.path,
+        )
+        tool_db = ToolDB.get_by(
+            self._client,
+            name=tool.name,
+            version_major=tool.version_major,
+            purpose=tool.purpose,
+        )
+
+        if len(tool_db) != 1:
+            raise Exception("Ambigious tool")
+
+        if len(doc_db) != 1:
+            raise Exception("Ambigious document")
+
+        link = DatabaseLinkDocEntity(
+            self._client,
+            doc_db[0].id,
+            tool_db[0].id,
+        )
+        link.add()
+
+    def get_tool_documents(self, tool: Tool) -> List[Document]:
+        tool_db = ToolDB.get_by(
+            self._client,
+            name=tool.name,
+            version_major=tool.version_major,
+            purpose=tool.purpose,
+        )
+
+        if len(tool_db) != 1:
+            raise Exception("Ambigious tool")
+
+        docs_db = link_docs_to_entity.get_linked_to_tools(self._client, tool_db[0])
+
+        return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
 
     @staticmethod
     def _convert_to(target_type, tool_database: Union[List[ToolID], List[SystemID]]) -> List[Any]:
@@ -135,12 +210,6 @@ class Api:
     def add_tool(self, tool: Tool) -> None:
         tool_database = DatabaseTool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
         tool_database.add()
-
-    def add_tool_document(self, tool: Tool, document: Document) -> None:
-        pass
-
-    def get_tool_documents(self, tool: Tool) -> List[Document]:
-        pass
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
         system_db = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)

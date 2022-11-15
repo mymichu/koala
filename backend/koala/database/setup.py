@@ -37,13 +37,14 @@ class DatabaseInitializer:
         self._client.sqlExec(
             """
             CREATE TABLE IF NOT EXISTS entity (
+                id INTEGER AUTO_INCREMENT,
                 name VARCHAR[256],
                 version_major INTEGER,
                 purpose VARCHAR[64],
                 changed_at TIMESTAMP,
                 is_system BOOLEAN,
                 gmp_relevant BOOLEAN,
-                PRIMARY KEY (name,version_major,purpose)
+                PRIMARY KEY (id)
                 );"""
         )
 

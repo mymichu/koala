@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List
 
 from immudb import ImmudbClient
@@ -12,7 +13,7 @@ class LinkSystemToolID:
     tool_name: str
     tool_major_version: int
     valid: bool = False
-    changed_at: str = ""
+    changed_at: datetime = None
     id: int = 0
 
 

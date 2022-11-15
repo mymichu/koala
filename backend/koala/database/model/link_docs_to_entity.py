@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import List
 from immudb import ImmudbClient
+from . import SystemID, ToolID, DocumentID
 
 
 @dataclass(unsafe_hash=True)
@@ -26,9 +27,9 @@ class LinkDocEntity(LinkDocEntityID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs: Dict[str, Any]) -> List[LinkDocEntityID]:
-    query = "SELECT document_id, entity_id, id FROM entity_x_document WHERE"
-    sep = " "
+def get_by(client: ImmudbClient, **kwargs) -> List[LinkDocEntityID]:
+    query = "SELECT document_id, entity_id, id FROM entity_x_document"
+    sep = " WHERE "
 
     for key, value in kwargs.items():
         if isinstance(value, str):
@@ -41,3 +42,25 @@ def get_by(client: ImmudbClient, **kwargs: Dict[str, Any]) -> List[LinkDocEntity
 
     resp = client.sqlQuery(query)
     return [LinkDocEntityID(*item) for item in resp]
+
+
+def get_linked_to_systems(client: ImmudbClient, tool: SystemID) -> List[DocumentID]:
+    docs_linked = client.sqlQuery(
+        f"""
+        SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
+        INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+        WHERE linker.entity_id = {tool.id}
+        """
+    )
+    return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
+
+
+def get_linked_to_tools(client: ImmudbClient, system: SystemID) -> List[DocumentID]:
+    docs_linked = client.sqlQuery(
+        f"""
+        SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
+        INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+        """
+        # WHERE linker.entity_id = {system.id}
+    )
+    return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]

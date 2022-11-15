@@ -254,29 +254,10 @@ def test_get_all_sdes_owned_by_given_user():
     pass
 
 
-def test_add_document(koala_api):
-    spec = {"name": "intro", "path": "path/to/intro"}
-    doc_a = Document(**spec)
-    koala_api.add_document(doc_a)
-
-    docs = koala_api.get_document(**spec)
-
-    assert doc_a in docs
-
-
-def test_add_link_doc_entity(koala_api):
-    spec = {"document_id": 1, "entity_id": 1}
-    doc_a = LinkDocEntity(**spec)
-    koala_api.add_link_doc_entity(doc_a)
-
-    docs = koala_api.get_link_doc_entity(**spec)
-    assert doc_a in docs
-
-
 def test_get_all_documents_for_given_tool(koala_api):
     clang = Tool(name="clang", version_major=13, purpose="compiler")
-    spec_a = {'name':'intro', 'path':"path/to/intro"}
-    spec_b = {'name':'class', 'path':'path/to/class'}
+    spec_a = {"name": "intro", "path": "path/to/intro"}
+    spec_b = {"name": "class", "path": "path/to/class"}
 
     doc_a = Document(**spec_a)
     doc_b = Document(**spec_b)
@@ -285,12 +266,12 @@ def test_get_all_documents_for_given_tool(koala_api):
     koala_api.add_document(doc_b)
 
     koala_api.add_tool(clang)
-    koala_api.add_system_document(clang, doc_a)
-    koala_api.add_system_document(clang, doc_b)
+    koala_api.add_tool_document(clang, doc_a)
+    koala_api.add_tool_document(clang, doc_b)
 
     result = koala_api.get_tool_documents(clang)
     assert set(result) == set(
-        Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")
+        [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
     )
 
 
@@ -308,7 +289,7 @@ def test_get_all_documents_for_given_sde(koala_api):
 
     result = koala_api.get_system_documents(esw1)
     assert set(result) == set(
-        Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")
+        [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
     )
 
 
