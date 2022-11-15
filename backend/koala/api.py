@@ -8,6 +8,8 @@ from koala.database.entity import SystemID
 from koala.database.entity import Tool as DatabaseTool
 from koala.database.entity import ToolID
 from koala.database.monitor import Monitor as DataBaseMonitor
+from koala.database.model import Document as DatabaseDocument
+from koala.database.model import document, DocumentID
 
 
 @dataclass(unsafe_hash=True)
@@ -52,6 +54,13 @@ class Api:
         system_database = DataBaseSystem(self._client, system.name, system.version_major, system.purpose)
         system_database.add()
 
+    def add_document(self, document: Document) -> None:
+        document_database = DatabaseDocument(self._client, document.name, document.path)
+        document_database.add()
+
+    def get_document(self, **kwargs) -> List[DocumentID]:
+        return document.get_by(self._client, **kwargs)
+
     def add_system_document(self, system: System, document: Document) -> None:
         pass
 
@@ -81,11 +90,6 @@ class Api:
         monitor_database = DataBaseMonitor(self._client)
         tool_database = monitor_database.get_non_gmp_relevant_tools()
         return self._convert_to(Tool, tool_database)
-
-    #    def get_documents(self, entity: Entity) -> List[Entity]:
-    #        monitor_database = DataBaseMonitor(self._client)
-    #        entity_database = monitor_database.get_documents(entity)
-    #        return self._convert_to(Entity, entity_database)
 
     def get_all_gmp_relevant_tools(self) -> List[Tool]:
         pass

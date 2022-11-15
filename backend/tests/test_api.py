@@ -5,6 +5,7 @@ from immudb import ImmudbClient
 
 from koala.api import Api, Document, System, Tool
 from koala.database.setup import DatabaseInitializer
+from koala.database.model import document
 
 host = os.getenv("IMMUDB_HOST", "database")
 print(f"DATABASE: {host}")
@@ -253,12 +254,28 @@ def test_get_all_sdes_owned_by_given_user():
     pass
 
 
+def test_add_document(koala_api):
+    spec = {"name": "intro", "path": "path/to/intro"}
+    doc_a = Document(**spec)
+    koala_api.add_document(doc_a)
+
+    docs = koala_api.get_document(**spec)
+
+    assert doc_a in docs
+
+
 def test_get_all_documents_for_given_tool(koala_api):
     clang = Tool(name="clang", version_major=13, purpose="compiler")
 
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    koala_api.add_document(doc_a)
+    koala_api.add_document(doc_b)
+
     koala_api.add_tool(clang)
-    koala_api.add_tool_document(clang, Document(name="intro", path="path/to/intro"))
-    koala_api.add_tool_document(clang, Document(name="class", path="path/to/class"))
+    koala_api.add_system_document(clang, doc_a)
+    koala_api.add_system_document(clang, doc_b)
 
     result = koala_api.get_tool_documents(clang)
     assert set(result) == set(
@@ -268,10 +285,15 @@ def test_get_all_documents_for_given_tool(koala_api):
 
 def test_get_all_documents_for_given_sde(koala_api):
     esw1 = Tool(name="esw1", version_major=13, purpose="esw1")
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    koala_api.add_document(doc_a)
+    koala_api.add_document(doc_b)
 
     koala_api.add_system(esw1)
-    koala_api.add_system_document(esw1, Document(name="intro", path="path/to/intro"))
-    koala_api.add_system_document(esw1, Document(name="class", path="path/to/class"))
+    koala_api.add_system_document(esw1, doc_a)
+    koala_api.add_system_document(esw1, doc_b)
 
     result = koala_api.get_system_documents(esw1)
     assert set(result) == set(

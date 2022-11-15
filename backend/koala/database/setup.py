@@ -57,3 +57,24 @@ class DatabaseInitializer:
                 PRIMARY KEY id
                 );"""
         )
+
+        self._client.sqlExec(
+            """
+            CREATE TABLE IF NOT EXISTS document (
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR[256],
+                path VARCHAR[256],
+                creation_date TIMESTAMP,
+                PRIMARY KEY id
+                );"""
+        )
+
+        self._client.sqlExec(
+            """
+            CREATE TABLE IF NOT EXISTS entity_x_document (
+                id INTEGER AUTO_INCREMENT,
+                document_id INTEGER,
+                entity_id INTEGER,
+                PRIMARY KEY id
+                );"""
+        )
