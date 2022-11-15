@@ -9,13 +9,21 @@ from koala.database.entity import Tool as DatabaseTool
 from koala.database.entity import ToolID
 from koala.database.monitor import Monitor as DataBaseMonitor
 from koala.database.model import Document as DatabaseDocument
-from koala.database.model import document, DocumentID
+from koala.database.model import document
+from koala.database.model import LinkDocEntity as DatabaseLinkDocEntity
+from koala.database.model import link_docs_to_entity
 
 
 @dataclass(unsafe_hash=True)
 class Document:
     name: str
     path: str
+
+
+@dataclass(unsafe_hash=True)
+class LinkDocEntity:
+    document_id: int
+    entity_id: int
 
 
 @dataclass(unsafe_hash=True)
@@ -58,8 +66,25 @@ class Api:
         document_database = DatabaseDocument(self._client, document.name, document.path)
         document_database.add()
 
-    def get_document(self, **kwargs) -> List[DocumentID]:
-        return document.get_by(self._client, **kwargs)
+    def get_document(self, **kwargs) -> List[Document]:
+        return [
+            Document(db_doc.name, db_doc.path)
+            for db_doc in document.get_by(self._client, **kwargs)
+        ]
+
+    def add_link_doc_entity(self, link: LinkDocEntity) -> None:
+        link_database = DatabaseLinkDocEntity(
+            self._client,
+            link.document_id,
+            link.entity_id
+        )
+        link_database.add()
+
+    def get_link_doc_entity(self, **kwargs) -> List[LinkDocEntity]:
+        return [
+            LinkDocEntity(link.document_id, link.entity_id)
+            for link in link_docs_to_entity.get_by(self._client, **kwargs)
+        ]
 
     def add_system_document(self, system: System, document: Document) -> None:
         pass

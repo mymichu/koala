@@ -75,6 +75,7 @@ class DatabaseInitializer:
                 id INTEGER AUTO_INCREMENT,
                 document_id INTEGER,
                 entity_id INTEGER,
+                creation_date TIMESTAMP,
                 PRIMARY KEY id
                 );"""
         )

@@ -3,9 +3,9 @@ import os
 import pytest
 from immudb import ImmudbClient
 
-from koala.api import Api, Document, System, Tool
+from koala.api import Api, Document, System, Tool, LinkDocEntity
 from koala.database.setup import DatabaseInitializer
-from koala.database.model import document
+
 
 host = os.getenv("IMMUDB_HOST", "database")
 print(f"DATABASE: {host}")
@@ -264,11 +264,22 @@ def test_add_document(koala_api):
     assert doc_a in docs
 
 
+def test_add_link_doc_entity(koala_api):
+    spec = {"document_id": 1, "entity_id": 1}
+    doc_a = LinkDocEntity(**spec)
+    koala_api.add_link_doc_entity(doc_a)
+
+    docs = koala_api.get_link_doc_entity(**spec)
+    assert doc_a in docs
+
+
 def test_get_all_documents_for_given_tool(koala_api):
     clang = Tool(name="clang", version_major=13, purpose="compiler")
+    spec_a = {'name':'intro', 'path':"path/to/intro"}
+    spec_b = {'name':'class', 'path':'path/to/class'}
 
-    doc_a = Document(name="intro", path="path/to/intro")
-    doc_b = Document(name="class", path="path/to/class")
+    doc_a = Document(**spec_a)
+    doc_b = Document(**spec_b)
 
     koala_api.add_document(doc_a)
     koala_api.add_document(doc_b)
