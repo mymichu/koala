@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Union
+from typing import Any, Dict, List, Union
 
 from immudb import ImmudbClient
 
@@ -71,14 +71,14 @@ class Api:
         document_database = DatabaseDocument(self._client, document.name, document.path)
         document_database.add()
 
-    def get_document(self, **kwargs) -> List[Document]:
+    def get_document(self, **kwargs: Dict[str, Any]) -> List[Document]:
         return [Document(db_doc.name, db_doc.path) for db_doc in document.get_by(self._client, **kwargs)]
 
     def add_link_doc_entity(self, link: LinkDocEntity) -> None:
         link_database = DatabaseLinkDocEntity(self._client, link.document_id, link.entity_id)
         link_database.add()
 
-    def get_link_doc_entity(self, **kwargs) -> List[LinkDocEntity]:
+    def get_link_doc_entity(self, **kwargs: Dict[str, Any]) -> List[LinkDocEntity]:
         return [
             LinkDocEntity(link.document_id, link.entity_id)
             for link in link_docs_to_entity.get_by(self._client, **kwargs)

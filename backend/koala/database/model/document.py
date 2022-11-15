@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, Dict, List
 from immudb import ImmudbClient
 
 
@@ -10,6 +10,8 @@ class DocumentID:
     id: int = 0
 
     def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, DocumentID):
+            return NotImplemented
         return self.name == __o.name and self.path == __o.path
 
 
@@ -29,7 +31,7 @@ class Document(DocumentID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs) -> List[DocumentID]:
+def get_by(client: ImmudbClient, **kwargs: Dict[str, Any]) -> List[DocumentID]:
     query = "SELECT name, path, id FROM document WHERE"
     sep = " "
 

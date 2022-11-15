@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, Dict, List
 from immudb import ImmudbClient
 
 
@@ -11,7 +11,7 @@ class LinkDocEntityID:
 
 
 class LinkDocEntity(LinkDocEntityID):
-    def __init__(self, client: ImmudbClient, document_id: str, entity_id: str):
+    def __init__(self, client: ImmudbClient, document_id: int, entity_id: int):
         super().__init__(document_id=document_id, entity_id=entity_id)
         self._client = client
 
@@ -26,7 +26,7 @@ class LinkDocEntity(LinkDocEntityID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs) -> List[LinkDocEntityID]:
+def get_by(client: ImmudbClient, **kwargs: Dict[str, Any]) -> List[LinkDocEntityID]:
     query = "SELECT document_id, entity_id, id FROM entity_x_document WHERE"
     sep = " "
 
