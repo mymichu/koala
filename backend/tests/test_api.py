@@ -3,7 +3,7 @@ import os
 import pytest
 from immudb import ImmudbClient
 
-from koala.api import Api, System, Tool
+from koala.api import Api, Document, LinkDocEntity, System, Tool
 from koala.database.setup import DatabaseInitializer
 
 host = os.getenv("IMMUDB_HOST", "database")
@@ -254,59 +254,42 @@ def test_get_all_sdes_owned_by_given_user():
 
 
 def test_get_all_documents_for_given_tool(koala_api):
-    esw1 = System(name="eSW1", version_major=1, purpose="building firmware")
-    koala_api.add_system(esw1)
     clang = Tool(name="clang", version_major=13, purpose="compiler")
+    spec_a = {"name": "intro", "path": "path/to/intro"}
+    spec_b = {"name": "class", "path": "path/to/class"}
+
+    doc_a = Document(**spec_a)
+    doc_b = Document(**spec_b)
+
+    koala_api.add_document(doc_a)
+    koala_api.add_document(doc_b)
+
     koala_api.add_tool(clang)
-    ide = Tool(name="ide", version_major=12, purpose="IDE")
-    koala_api.add_tool(ide)
+    koala_api.add_tool_document(clang, doc_a)
+    koala_api.add_tool_document(clang, doc_b)
 
-    esw2 = System(name="eSW2", version_major=2, purpose="building firmware")
-    koala_api.add_system(esw2)
-    gtest = Tool(name="gtest", version_major=13, purpose="compiler")
-    koala_api.add_tool(gtest)
-    artifactory = Tool(name="artifactory", version_major=12, purpose="IDE")
-    koala_api.add_tool(artifactory)
-
-    koala_api.link_tools_to_system(tools=[clang, ide], system=esw1)
-    koala_api.link_tools_to_system(tools=[gtest, artifactory], system=esw2)
-
-    result = koala_api.get_documents(clang)
-    assert esw1 in result
-
-    result = koala_api.get_documents(ide)
-    assert esw1 in result
-
-    result = koala_api.get_documents(gtest)
-    assert esw2 in result
-
-    result = koala_api.get_documents(artifactory)
-    assert esw2 in result
+    result = koala_api.get_tool_documents(clang)
+    assert set(result) == set(
+        [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
+    )
 
 
 def test_get_all_documents_for_given_sde(koala_api):
-    esw1 = System(name="eSW1", version_major=1, purpose="building firmware")
+    esw1 = Tool(name="esw1", version_major=13, purpose="esw1")
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    koala_api.add_document(doc_a)
+    koala_api.add_document(doc_b)
+
     koala_api.add_system(esw1)
-    clang = Tool(name="clang", version_major=13, purpose="compiler")
-    koala_api.add_tool(clang)
-    ide = Tool(name="ide", version_major=12, purpose="IDE")
-    koala_api.add_tool(ide)
+    koala_api.add_system_document(esw1, doc_a)
+    koala_api.add_system_document(esw1, doc_b)
 
-    esw2 = System(name="eSW2", version_major=2, purpose="building firmware")
-    koala_api.add_system(esw2)
-    gtest = Tool(name="gtest", version_major=13, purpose="compiler")
-    koala_api.add_tool(gtest)
-    artifactory = Tool(name="artifactory", version_major=12, purpose="IDE")
-    koala_api.add_tool(artifactory)
-
-    koala_api.link_tools_to_system(tools=[clang, ide], system=esw1)
-    koala_api.link_tools_to_system(tools=[gtest, artifactory], system=esw2)
-
-    result = koala_api.get_documents(esw1)
-    assert all(item in result for item in [clang, ide])
-
-    result = koala_api.get_documents(esw2)
-    assert all(item in result for item in [gtest, artifactory])
+    result = koala_api.get_system_documents(esw1)
+    assert set(result) == set(
+        [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
+    )
 
 
 def test_get_status_for_given_tool():

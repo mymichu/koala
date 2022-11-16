@@ -37,13 +37,14 @@ class DatabaseInitializer:
         self._client.sqlExec(
             """
             CREATE TABLE IF NOT EXISTS entity (
+                id INTEGER AUTO_INCREMENT,
                 name VARCHAR[256],
                 version_major INTEGER,
                 purpose VARCHAR[64],
                 changed_at TIMESTAMP,
                 is_system BOOLEAN,
                 gmp_relevant BOOLEAN,
-                PRIMARY KEY (name,version_major,purpose)
+                PRIMARY KEY (id)
                 );"""
         )
 
@@ -54,6 +55,28 @@ class DatabaseInitializer:
                 change VARCHAR[256],
                 entity_name VARCHAR[256],
                 entity_major_version INTEGER,
+                PRIMARY KEY id
+                );"""
+        )
+
+        self._client.sqlExec(
+            """
+            CREATE TABLE IF NOT EXISTS document (
+                id INTEGER AUTO_INCREMENT,
+                name VARCHAR[256],
+                path VARCHAR[256],
+                creation_date TIMESTAMP,
+                PRIMARY KEY id
+                );"""
+        )
+
+        self._client.sqlExec(
+            """
+            CREATE TABLE IF NOT EXISTS entity_x_document (
+                id INTEGER AUTO_INCREMENT,
+                document_id INTEGER,
+                entity_id INTEGER,
+                creation_date TIMESTAMP,
                 PRIMARY KEY id
                 );"""
         )
