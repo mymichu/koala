@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -12,7 +13,7 @@ class Entity:
     is_system: bool
     gmp_relevant: bool = True
     change_at: datetime = datetime.now()
-    id: int = 0
+    _id: int = 0
 
 
 class DataBaseEntity:
@@ -38,3 +39,16 @@ class DataBaseEntity:
         """
         )
         return len(resp) == 1
+
+
+def get_by(client: ImmudbClient, **kwargs: Any) -> List:
+    query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
+    sep = " WHERE "
+    for key, value in kwargs.items():
+        if isinstance(value, str):
+            condition = f"{sep}{key}='{value}'"
+        else:
+            condition = f"{sep}{key}={value}"
+        sep = " AND "
+        query += condition
+    return list(client.sqlQuery(query))
