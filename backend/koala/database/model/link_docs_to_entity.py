@@ -3,7 +3,9 @@ from typing import Any, List
 
 from immudb import ImmudbClient
 
-from . import DocumentID, SystemID, ToolID
+from .document import DocumentID
+from .system import SystemID
+from .tool import ToolID
 
 
 @dataclass(unsafe_hash=True)

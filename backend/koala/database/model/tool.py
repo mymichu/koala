@@ -3,7 +3,7 @@ from typing import Any, List
 
 from immudb import ImmudbClient
 
-from . import DataBaseEntity, Entity
+from .entity import DataBaseEntity, Entity
 
 
 @dataclass
