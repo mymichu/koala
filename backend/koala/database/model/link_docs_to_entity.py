@@ -12,7 +12,7 @@ from .tool import ToolID
 class LinkDocEntityID:
     entity_id: int
     document_id: int
-    _id: int = 0
+    identity: int = 0
 
 
 class LinkDocEntity(LinkDocEntityID):
@@ -53,7 +53,7 @@ def get_linked_to_systems(client: ImmudbClient, system: SystemID) -> List[Docume
         f"""
         SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
         INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
-        WHERE linker.entity_id = {system.id}
+        WHERE linker.entity_id = {system.identity}
         """
     )
     return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
@@ -64,7 +64,7 @@ def get_linked_to_tools(client: ImmudbClient, tool: ToolID) -> List[DocumentID]:
         f"""
         SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
         INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
-        WHERE linker.entity_id = {tool.id}
+        WHERE linker.entity_id = {tool.identity}
         """
     )
     return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
