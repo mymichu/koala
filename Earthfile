@@ -15,7 +15,7 @@ install:
 
 check:
     FROM +install
-#    RUN poetry run isort . --check
+    RUN poetry run isort . --check
     RUN poetry run mypy .
 
 build:

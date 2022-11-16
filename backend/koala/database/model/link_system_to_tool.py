@@ -4,7 +4,8 @@ from typing import List
 
 from immudb import ImmudbClient
 
-from . import SystemID, ToolID
+from .system import SystemID
+from .tool import ToolID
 
 
 @dataclass

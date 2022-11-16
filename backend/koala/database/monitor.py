@@ -2,7 +2,8 @@ from typing import List
 
 from immudb import ImmudbClient
 
-from .model import SystemID, ToolID
+from .model.system import SystemID
+from .model.tool import ToolID
 
 
 def _in(entitylinker: tuple, entity: tuple) -> bool:
@@ -82,4 +83,3 @@ class Monitor:
         """
         )
         return list(map(lambda x: ToolID(*x), resp))
-
