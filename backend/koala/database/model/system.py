@@ -4,6 +4,7 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 from .entity import DataBaseEntity, Entity
+from .entity import get_by as get_entity_by
 
 
 @dataclass
@@ -29,17 +30,5 @@ class System(SystemID):
 
 
 def get_by(client: ImmudbClient, **kwargs: Any) -> List[SystemID]:
-    query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
-    sep = " WHERE "
-
-    for key, value in kwargs.items():
-        if isinstance(value, str):
-            condition = f"{sep}{key}='{value}'"
-        else:
-            condition = f"{sep}{key}={value}"
-
-        sep = " AND "
-        query += condition
-
-    resp = client.sqlQuery(query)
-    return [SystemID(*item) for item in resp]
+    entities = get_entity_by(client, **kwargs)
+    return [SystemID(*item) for item in entities]

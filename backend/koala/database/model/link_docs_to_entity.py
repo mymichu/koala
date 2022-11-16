@@ -12,7 +12,8 @@ from .tool import ToolID
 class LinkDocEntityID:
     entity_id: int
     document_id: int
-    id: int = 0
+    _id: int = 0
+
 
 
 class LinkDocEntity(LinkDocEntityID):

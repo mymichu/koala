@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from immudb import ImmudbClient
 
@@ -40,8 +40,10 @@ class Entity:
     purpose: str
 
 
+
 class System(Entity):
     pass
+
 
 
 class Tool(Entity):

@@ -4,6 +4,7 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 from .entity import DataBaseEntity, Entity
+from .entity import get_by as get_entity_by
 
 
 @dataclass
@@ -11,6 +12,7 @@ class ToolID(Entity):
     is_system: bool = False
 
 
+# pylint: disable=too-many-arguments
 class Tool(ToolID):
     def __init__(
         self, client: ImmudbClient, name: str, version_major: int, purpose: str, gmp_relevant: bool = True
@@ -31,17 +33,5 @@ class Tool(ToolID):
 
 
 def get_by(client: ImmudbClient, **kwargs: Any) -> List[ToolID]:
-    query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
-    sep = " WHERE "
-
-    for key, value in kwargs.items():
-        if isinstance(value, str):
-            condition = f"{sep}{key}='{value}'"
-        else:
-            condition = f"{sep}{key}={value}"
-
-        sep = " AND "
-        query += condition
-
-    resp = client.sqlQuery(query)
-    return [ToolID(*item) for item in resp]
+    entities = get_entity_by(client, **kwargs)
+    return [ToolID(*item) for item in entities]
