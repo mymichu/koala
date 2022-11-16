@@ -31,22 +31,34 @@ class LinkSystemTool(LinkSystemToolID):
 
     def add(self) -> None:
         self._client.sqlExec(
-            f"""
+            """
             BEGIN TRANSACTION;
             INSERT INTO  entitylinker(system_name, system_major_version, tool_name, tool_major_version, valid, changed_at)
-            VALUES ('{self.system_name}', {self.system_major_version}, '{self.tool_name}',{self.tool_major_version}, TRUE, NOW());
+            VALUES (@system_name, @system_major_version, @tool_name, @tool_major_version, TRUE, NOW());
             COMMIT;
-            """
+            """,
+            params={
+                "system_name": self.system_name,
+                "system_major_version": self.system_major_version,
+                "tool_name": self.tool_name,
+                "tool_major_version": self.tool_major_version,
+            },
         )
 
     def remove(self) -> None:
         self._client.sqlExec(
-            f"""
+            """
             BEGIN TRANSACTION;
             INSERT INTO  entitylinker(system_name, tool_ownerversion_major, tool_name, toolversion_major, valid, changed_at)
-            VALUES ('{self.system_name}', {self.system_major_version}, '{self.tool_name}',{self.tool_major_version}, FALSE, NOW());
+            VALUES (@system_name , @system_major_version, @tool_name,@tool_major_version, FALSE, NOW());
             COMMIT;
-                """
+                """,
+            params={
+                "system_name": self.system_name,
+                "system_major_version": self.system_major_version,
+                "tool_name": self.tool_name,
+                "tool_major_version": self.tool_major_version,
+            },
         )
 
 
