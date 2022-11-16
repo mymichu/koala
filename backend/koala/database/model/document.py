@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -9,7 +9,7 @@ from immudb import ImmudbClient
 class DocumentID:
     name: str
     path: str
-    creation_date: datetime = None
+    creation_date: datetime = datetime.now()
     id: int = 0
 
 
@@ -29,7 +29,7 @@ class Document(DocumentID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs) -> List[DocumentID]:
+def get_by(client: ImmudbClient, **kwargs: Any) -> List[DocumentID]:
     query = "SELECT name, path, creation_date, id FROM document"
     sep = " WHERE "
 

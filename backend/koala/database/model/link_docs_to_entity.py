@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -29,7 +29,7 @@ class LinkDocEntity(LinkDocEntityID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs) -> List[LinkDocEntityID]:
+def get_by(client: ImmudbClient, **kwargs: Any) -> List[LinkDocEntityID]:
     query = "SELECT document_id, entity_id, id FROM entity_x_document"
     sep = " WHERE "
 
@@ -46,23 +46,23 @@ def get_by(client: ImmudbClient, **kwargs) -> List[LinkDocEntityID]:
     return [LinkDocEntityID(*item) for item in resp]
 
 
-def get_linked_to_systems(client: ImmudbClient, tool: SystemID) -> List[DocumentID]:
-    docs_linked = client.sqlQuery(
-        f"""
-        SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
-        INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
-        WHERE linker.entity_id = {tool.id}
-        """
-    )
-    return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
-
-
-def get_linked_to_tools(client: ImmudbClient, system: SystemID) -> List[DocumentID]:
+def get_linked_to_systems(client: ImmudbClient, system: SystemID) -> List[DocumentID]:
     docs_linked = client.sqlQuery(
         f"""
         SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
         INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
         WHERE linker.entity_id = {system.id}
+        """
+    )
+    return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
+
+
+def get_linked_to_tools(client: ImmudbClient, tool: ToolID) -> List[DocumentID]:
+    docs_linked = client.sqlQuery(
+        f"""
+        SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
+        INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+        WHERE linker.entity_id = {tool.id}
         """
     )
     return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]

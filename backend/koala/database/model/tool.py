@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -11,16 +11,13 @@ class ToolID(Entity):
     is_system: bool = False
 
 
-class Tool:
+class Tool(ToolID):
     def __init__(
         self, client: ImmudbClient, name: str, version_major: int, purpose: str, gmp_relevant: bool = True
     ) -> None:
+        super().__init__(name=name, version_major=version_major, purpose=purpose, gmp_relevant=gmp_relevant)
         self._client = client
         self._entity = DataBaseEntity(client=client)
-        self.name = name
-        self.version_major = version_major
-        self.purpose = purpose
-        self.gmp_relevant = gmp_relevant
 
     def add(self) -> None:
         self._entity.insert(
@@ -33,7 +30,7 @@ class Tool:
         )
 
 
-def get_by(client: ImmudbClient, **kwargs) -> List[ToolID]:
+def get_by(client: ImmudbClient, **kwargs: Any) -> List[ToolID]:
     query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
     sep = " WHERE "
 

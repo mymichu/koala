@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -28,7 +28,7 @@ class System(SystemID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs) -> List[SystemID]:
+def get_by(client: ImmudbClient, **kwargs: Any) -> List[SystemID]:
     query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
     sep = " WHERE "
 

@@ -162,8 +162,8 @@ class Api:
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
 
     @staticmethod
-    def _convert_to(target_type, tool_database: Union[List[ToolID], List[SystemID]]) -> List[Any]:
-        tools: List[target_type] = []
+    def _convert_to(target_type: Any, tool_database: Any) -> List[Any]:
+        tools: List[Any] = []
         for tool_db in tool_database:
             if isinstance(tool_db, ToolID):
                 tools.append(target_type(tool_db.name, tool_db.version_major, tool_db.purpose, tool_db.gmp_relevant))

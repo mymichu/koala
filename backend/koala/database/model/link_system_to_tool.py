@@ -14,7 +14,7 @@ class LinkSystemToolID:
     tool_name: str
     tool_major_version: int
     valid: bool = False
-    changed_at: datetime = None
+    changed_at: datetime = datetime.now()
     id: int = 0
 
 

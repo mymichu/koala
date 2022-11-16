@@ -11,7 +11,7 @@ class Entity:
     purpose: str
     is_system: bool
     gmp_relevant: bool = True
-    change_at: datetime = None
+    change_at: datetime = datetime.now()
     id: int = 0
 
 
