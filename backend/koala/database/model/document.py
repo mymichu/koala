@@ -29,7 +29,7 @@ class Document(DocumentID):
 
 
 def get_by(client: ImmudbClient, **kwargs) -> List[DocumentID]:
-    query = "SELECT name, path, id FROM document"
+    query = "SELECT name, path, creation_date, id FROM document"
     sep = " WHERE "
 
     for key, value in kwargs.items():

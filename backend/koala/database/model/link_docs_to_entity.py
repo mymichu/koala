@@ -60,7 +60,7 @@ def get_linked_to_tools(client: ImmudbClient, system: SystemID) -> List[Document
         f"""
         SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
         INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+        WHERE linker.entity_id = {system.id}
         """
-        # WHERE linker.entity_id = {system.id}
     )
     return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
