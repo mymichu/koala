@@ -10,7 +10,7 @@ class DocumentID:
     name: str
     path: str
     creation_date: datetime = datetime.now()
-    _id: int = 0
+    identity: int = 0
 
 
 class Document(DocumentID):

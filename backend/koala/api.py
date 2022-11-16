@@ -104,8 +104,8 @@ class Api:
 
         link = DatabaseLinkDocEntity(
             self._client,
-            doc_db[0].id,
-            sys_db[0].id,
+            doc_db[0].identity,
+            sys_db[0].identity,
         )
         link.add()
 
@@ -145,8 +145,8 @@ class Api:
 
         link = DatabaseLinkDocEntity(
             self._client,
-            doc_db[0].id,
-            tool_db[0].id,
+            doc_db[0].identity,
+            tool_db[0].identity,
         )
         link.add()
 

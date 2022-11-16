@@ -13,7 +13,7 @@ class Entity:
     is_system: bool
     gmp_relevant: bool = True
     change_at: datetime = datetime.now()
-    _id: int = 0
+    identity: int = 0
 
 
 class DataBaseEntity:
