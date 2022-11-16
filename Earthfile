@@ -18,6 +18,7 @@ check:
     RUN poetry run isort . --check
     RUN poetry run pylint koala
     RUN poetry run black . --check
+    RUN poetry run flake8 koala
     RUN poetry run mypy .
 
 build:

@@ -15,7 +15,6 @@ class LinkDocEntityID:
     _id: int = 0
 
 
-
 class LinkDocEntity(LinkDocEntityID):
     def __init__(self, client: ImmudbClient, document_id: int, entity_id: int):
         super().__init__(document_id=document_id, entity_id=entity_id)
