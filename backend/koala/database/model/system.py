@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import List
+
 from immudb import ImmudbClient
 
-from . import Entity, DataBaseEntity
+from . import DataBaseEntity, Entity
 
 
 @dataclass

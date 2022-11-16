@@ -3,9 +3,8 @@ import os
 import pytest
 from immudb import ImmudbClient
 
-from koala.api import Api, Document, System, Tool, LinkDocEntity
+from koala.api import Api, Document, LinkDocEntity, System, Tool
 from koala.database.setup import DatabaseInitializer
-
 
 host = os.getenv("IMMUDB_HOST", "database")
 print(f"DATABASE: {host}")

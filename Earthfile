@@ -15,7 +15,7 @@ install:
 
 check:
     FROM +install
-    RUN poetry run isort . --check
+#    RUN poetry run isort . --check
     RUN poetry run mypy .
 
 build:
@@ -30,4 +30,3 @@ test:
         --service database
         RUN poetry run pytest
     END
-   

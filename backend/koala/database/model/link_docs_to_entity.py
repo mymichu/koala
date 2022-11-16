@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import List
+
 from immudb import ImmudbClient
-from . import SystemID, ToolID, DocumentID
+
+from . import DocumentID, SystemID, ToolID
 
 
 @dataclass(unsafe_hash=True)

@@ -3,21 +3,17 @@ from typing import Any, Dict, List, Union
 
 from immudb import ImmudbClient
 
-from koala.database.model import (
-    SystemID,
-    ToolID,
-    system as SystemDB,
-    tool as ToolDB,
-    document as DocumentDB,
-    link_system_to_tool,
-    link_docs_to_entity,
-    System as DataBaseSystem,
-    Tool as DatabaseTool,
-    Document as DatabaseDocument,
-    LinkDocEntity as DatabaseLinkDocEntity,
-    LinkSystemTool as DatabaseLinkSystemTool,
-)
-
+from koala.database.model import Document as DatabaseDocument
+from koala.database.model import LinkDocEntity as DatabaseLinkDocEntity
+from koala.database.model import LinkSystemTool as DatabaseLinkSystemTool
+from koala.database.model import System as DataBaseSystem
+from koala.database.model import SystemID
+from koala.database.model import Tool as DatabaseTool
+from koala.database.model import ToolID
+from koala.database.model import document as DocumentDB
+from koala.database.model import link_docs_to_entity, link_system_to_tool
+from koala.database.model import system as SystemDB
+from koala.database.model import tool as ToolDB
 from koala.database.monitor import Monitor as DataBaseMonitor
 
 
