@@ -40,10 +40,8 @@ class Entity:
     purpose: str
 
 
-
 class System(Entity):
     pass
-
 
 
 class Tool(Entity):

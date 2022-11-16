@@ -1,0 +1,4 @@
+[flake8]
+extend-ignore = E501 #ignore max line length in flake8 this is covered by pylint 
+exclude = .git,__pycache__,docs/source/conf.py,old,build,dist
+max-complexity = 10
