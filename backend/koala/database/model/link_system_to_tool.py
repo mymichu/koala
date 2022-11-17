@@ -64,12 +64,16 @@ class LinkSystemTool(LinkSystemToolID):
 
 def get_linked_tools(client: ImmudbClient, system: SystemID) -> List[ToolID]:
     tools_linked = client.sqlQuery(
-        f"""
+        """
         SELECT linker.tool_name, linker.tool_major_version, tool.purpose
         FROM entitylinker AS linker
         INNER JOIN entity AS tool ON linker.tool_name = tool.name AND linker.tool_major_version = tool.version_major
-        WHERE linker.system_name = '{system.name}' AND linker.system_major_version = {system.version_major} AND linker.valid = TRUE AND tool.is_system=FALSE;
-        """
+        WHERE linker.system_name = @system_name AND linker.system_major_version = @system_major_version AND linker.valid = TRUE AND tool.is_system=FALSE;
+        """,
+        params={
+            "system_name": system.name,
+            "system_major_version": system.version_major,
+        },
     )
 
     return [
@@ -80,12 +84,16 @@ def get_linked_tools(client: ImmudbClient, system: SystemID) -> List[ToolID]:
 
 def get_linked_systems(client: ImmudbClient, tool: ToolID) -> List[SystemID]:
     systems_linked = client.sqlQuery(
-        f"""
+        """
         SELECT linker.system_name, linker.system_major_version, system.purpose
         FROM entitylinker AS linker
         INNER JOIN entity AS system ON linker.system_name = system.name AND linker.system_major_version = system.version_major
-        WHERE linker.tool_name = '{tool.name}' AND linker.tool_major_version = {tool.version_major} AND valid = TRUE AND system.is_system=TRUE;
-        """
+        WHERE linker.tool_name = @tool_name AND linker.tool_major_version = @tool_major_version AND valid = TRUE AND system.is_system=TRUE;
+        """,
+        params={
+            "tool_name": tool.name,
+            "tool_major_version": tool.version_major,
+        },
     )
     return [
         SystemID(name=system_name, version_major=system_major_version, purpose=purpose)

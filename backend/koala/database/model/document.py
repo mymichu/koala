@@ -20,12 +20,16 @@ class Document(DocumentID):
 
     def add(self) -> None:
         self._client.sqlExec(
-            f"""
+            """
         BEGIN TRANSACTION;
             INSERT INTO document (name, path, creation_date)
-            VALUES ('{self.name}', '{self.path}', NOW());
+            VALUES (@name, @path, NOW());
         COMMIT;
-        """
+        """,
+            params={
+                "name": self.name,
+                "path": self.path,
+            },
         )
 
 
