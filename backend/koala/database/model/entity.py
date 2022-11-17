@@ -22,21 +22,32 @@ class DataBaseEntity:
 
     def insert(self, entiy: Entity) -> None:
         self._client.sqlExec(
-            f"""
+            """
         BEGIN TRANSACTION;
             INSERT INTO entity (name, version_major, purpose, changed_at, is_system, gmp_relevant)
-            VALUES ('{entiy.name}', {entiy.version_major},'{entiy.purpose}', NOW(), {entiy.is_system}, {entiy.gmp_relevant});
+            VALUES (@name, @version_major,@purpose, NOW(), @is_system, @gmp_relevant);
         COMMIT;
-        """
+        """,
+            params={
+                "name": entiy.name,
+                "version_major": entiy.version_major,
+                "purpose": entiy.purpose,
+                "is_system": entiy.is_system,
+                "gmp_relevant": entiy.gmp_relevant,
+            },
         )
 
     def is_valid(self, name: str, version_major: int) -> bool:
         resp = self._client.sqlQuery(
-            f"""
+            """
         SELECT * FROM entity
-        WHERE name = '{name}'
-        AND version_major = {version_major};
-        """
+        WHERE name = @name
+        AND version_major = @version_major;
+        """,
+            params={
+                "name": name,
+                "version_major": version_major,
+            },
         )
         return len(resp) == 1
 

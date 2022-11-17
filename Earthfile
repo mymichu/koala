@@ -20,7 +20,8 @@ check:
     RUN poetry run black . --check
     RUN poetry run flake8 koala
     RUN poetry run mypy .
-
+    RUN poetry run bandit -r koala
+    
 build:
     FROM +check
     RUN poetry build

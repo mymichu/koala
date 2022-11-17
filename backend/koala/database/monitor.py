@@ -59,10 +59,11 @@ class Monitor:
 
     def get_tools(self, name: str) -> List[ToolID]:
         resp = self._client.sqlQuery(
-            f"""
+            """
         SELECT name, version_major, purpose, gmp_relevant FROM entity
-        WHERE name = '{name}' AND is_system = FALSE;
-        """
+        WHERE name = @name AND is_system = FALSE;
+        """,
+            params={"name": name},
         )
         return list(map(lambda x: ToolID(*x), resp))
 
