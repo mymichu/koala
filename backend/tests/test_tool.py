@@ -1,74 +1,13 @@
-import os
-
 import pytest
-from dependency_injector import providers
 
 from koala.api.document import DocumentApi
 from koala.api.system import SystemApi
 from koala.api.tool import ToolApi
 from koala.api.types import Document, System, Tool
 from koala.api.user import UserApi, UserData
-from koala.factory import ContainerApi, ContainerDatabase
-
-host = os.getenv("IMMUDB_HOST", "database")
-print(f"DATABASE: {host}")
-URL = f"{host}:3322"
-USERNAME = "immudb"
-PASSWORD = "immudb"
 
 
-@pytest.fixture(scope="function")
-def koala_api(request):
-    config = providers.Configuration()
-    database_name = request.node.name.replace("_", "")
-    config.from_dict(
-        {
-            "database": {"url": URL, "name": database_name, "username": USERNAME, "password": PASSWORD},
-        },
-    )
-    database_container = ContainerDatabase(config=config)
-    api_container = ContainerApi(config=config, immuclient=database_container.immuclient)
-    immuclient = database_container.immuclient()
-    immuclient.login(username=USERNAME, password=PASSWORD)
-    database = database_container.database()
-    database.delete()
-    database.create_and_use()
-    database.setup_tables()
-    yield api_container
-    database.delete()
-    client = database_container.immuclient()
-    client.logout()
-    client.shutdown()
-
-
-# TODO: PURE SYSTEM API TESTS move to test_system_api.py
-def test_get_all_sdes_returns_none_when_empty(koala_api):
-    api: SystemApi = koala_api.api_system_factory()
-    assert api.get_all_systems() == []
-
-
-def test_add_one_sde(koala_api):
-    api: SystemApi = koala_api.api_system_factory()
-    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api.add_system(esw1)
-    all_sdes = api.get_all_systems()
-    print(all_sdes)
-    assert set(all_sdes) == set([esw1])
-
-
-def test_add_two_sdes_same_name_and_purpose_different_versions(koala_api):
-    api: SystemApi = koala_api.api_system_factory()
-    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api.add_system(esw1)
-
-    esw2 = System(name="eSW", version_major=2, purpose="building firmware")
-    api.add_system(esw2)
-
-    all_sdes = api.get_all_systems()
-    assert set(all_sdes) == set([esw1, esw2])
-
-
-# TODO: PURE Tool API TESTS move to test_tool_api.py
+@pytest.mark.usefixtures("koala_api")
 def test_get_all_tools_return_none_when_empty(koala_api):
     api: ToolApi = koala_api.api_tool_factory()
     assert api.get_all_tools() == []
@@ -186,30 +125,6 @@ def test_link_existing_tool_to_existing_sde(koala_api):
     assert set(tools) == set([gcc, clang])
 
 
-# TODO: System API TESTS move to test_system_api.py
-def test_link_existing_sde_to_existing_tool(koala_api):
-    api_tool: ToolApi = koala_api.api_tool_factory()
-    api_system: SystemApi = koala_api.api_system_factory()
-    esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api_system.add_system(esw1)
-
-    project_x = System(name="project x", version_major=1, purpose="building firmware for project X")
-    api_system.add_system(project_x)
-
-    project_y = System(name="project y", version_major=2, purpose="building firmware for project Y")
-    api_system.add_system(project_y)
-
-    gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api_tool.add_tool(gcc)
-
-    api_tool.link_tools_to_system(tools=[gcc], system=esw1)
-    api_tool.link_tools_to_system(tools=[gcc], system=project_x)
-
-    systems = api_system.get_systems_for_tool(gcc)
-    assert set(systems) == set([esw1, project_x])
-
-
-# TODO: Tool API TESTS move to tool_api_test.py
 def test_get_all_tools_not_in_any_sde(koala_api):
     api_tool: ToolApi = koala_api.api_tool_factory()
     api_system: SystemApi = koala_api.api_system_factory()
@@ -252,31 +167,18 @@ def test_get_all_non_gmp_relevant_tools(koala_api):
     assert set(relevant_non_gmp_tools) == set([ide])
 
 
+@pytest.mark.skip(reason="Not Implemented")
 def test_submit_change_for_given_user_and_given_tool():
     pass
 
 
-def test_submit_change_for_given_user_and_given_sde():
-    pass
-
-
-def test_user_approves_given_change():
-    pass
-
-
-def test_user_refuses_given_change():
-    pass
-
-
+@pytest.mark.skip(reason="Not Implemented")
 def test_get_all_changes_for_given_tool():
     pass
 
 
+@pytest.mark.skip(reason="Not Implemented")
 def test_get_all_changes_for_given_tool_between_date1_and_date2():
-    pass
-
-
-def test_get_all_changes_for_given_sde_between_date1_and_date2():
     pass
 
 
@@ -295,10 +197,6 @@ def test_get_all_tools_owned_by_given_user(koala_api):
     tools = api_tool.get_all_tools_owned_by(email_max)
     assert len(tools) == 2
     assert set(tools) == set([gcc, clang])
-
-
-def test_get_all_sdes_owned_by_given_user():
-    pass
 
 
 def test_get_all_documents_for_given_tool(koala_api):
@@ -324,37 +222,11 @@ def test_get_all_documents_for_given_tool(koala_api):
     )
 
 
-def test_get_all_documents_for_given_sde(koala_api):
-    api_system: SystemApi = koala_api.api_system_factory()
-    api_document: DocumentApi = koala_api.api_document_factory()
-    esw1 = System(name="esw1", version_major=13, purpose="esw1")
-    doc_a = Document(name="intro", path="path/to/intro")
-    doc_b = Document(name="class", path="path/to/class")
-
-    api_document.add_document(doc_a)
-    api_document.add_document(doc_b)
-
-    api_system.add_system(esw1)
-    api_system.add_system_document(esw1, doc_a)
-    api_system.add_system_document(esw1, doc_b)
-
-    result = api_system.get_system_documents(esw1)
-    assert set(result) == set(
-        [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
-    )
-
-
+@pytest.mark.skip(reason="Not Implemented")
 def test_get_status_for_given_tool():
     pass
 
 
-def test_get_status_for_given_sde():
-    pass
-
-
+@pytest.mark.skip(reason="Not Implemented")
 def test_get_number_of_days_left_before_next_periodic_review_for_given_tool():
-    pass
-
-
-def test_get_number_of_days_left_before_next_periodic_review_for_given_sde():
     pass

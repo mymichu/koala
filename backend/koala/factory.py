@@ -1,5 +1,3 @@
-from xml.dom.minidom import Document
-
 from dependency_injector import containers, providers
 from immudb import ImmudbClient
 

@@ -3,8 +3,8 @@ from typing import List
 from immudb import ImmudbClient
 
 from koala.database.model import document as DocumentDB
-from koala.database.model import link_system_to_tool as LinkerSystemTool
 from koala.database.model import link_docs_to_entity as LinkerDocEntityDB
+from koala.database.model import link_system_to_tool as LinkerSystemTool
 from koala.database.model import system as SystemDB
 from koala.database.model import tool as ToolDB
 from koala.database.model.link_docs_to_entity import (

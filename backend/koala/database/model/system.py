@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import List
 
 from immudb import ImmudbClient
 
@@ -16,36 +16,21 @@ class System(SystemID):
     def __init__(self, client: ImmudbClient, name: str, version_major: int, purpose: str) -> None:
         super().__init__(name=name, version_major=version_major, purpose=purpose, gmp_relevant=True)
         self._client = client
-        self._entity = DataBaseEntity(client=client)
-
-    def add(self) -> None:
-        self._entity.insert(
-            SystemID(
+        self._entity = DataBaseEntity(
+            client=client,
+            entity=SystemID(
                 name=self.name,
                 version_major=self.version_major,
                 purpose=self.purpose,
                 gmp_relevant=self.gmp_relevant,
-            )
+            ),
         )
 
+    def add(self) -> None:
+        self._entity.insert()
+
     def get_id(self) -> int:
-        resp = self._client.sqlQuery(
-            """
-                SELECT id FROM entity
-                WHERE name = @name
-                AND version_major = @version_major
-                AND purpose = @purpose
-                AND is_system = TRUE;
-                """,
-            params={
-                "name": self.name,
-                "version_major": self.version_major,
-                "purpose": self.purpose,
-            },
-        )
-        if len(resp) != 1:
-            raise Exception("System not found")
-        return int(resp[0][0])
+        return self._entity.get_id()
 
 
 class SystemMonitor:

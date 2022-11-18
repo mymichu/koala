@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -34,11 +33,12 @@ class Document(DocumentID):
 
     def get_id(self) -> int:
         resp = self._client.sqlQuery(
-            f"""
-            SELECT id FROM document
-            WHERE name='{self.name}'
-            AND path='{self.path}'
             """
+            SELECT id FROM document
+            WHERE name=@name
+            AND path=@path
+            """,
+            params={"name": self.name, "path": self.path},
         )
         if len(resp) != 1:
             raise Exception("Document not found")
