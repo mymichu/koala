@@ -5,6 +5,7 @@ from koala.api.api import Api
 from koala.api.user import UserApi
 from koala.database.setup import DatabaseInitializer
 
+
 # pylint: disable=no-member
 class ContainerDatabase(containers.DeclarativeContainer):
     config = providers.Configuration(strict=True)
