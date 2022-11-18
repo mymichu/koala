@@ -33,8 +33,8 @@ class System(SystemID):
         resp = self._client.sqlQuery(
             """
                 SELECT id FROM entity
-                WHERE name = @name 
-                AND version_major = @version_major 
+                WHERE name = @name
+                AND version_major = @version_major
                 AND purpose = @purpose
                 AND is_system = TRUE;
                 """,

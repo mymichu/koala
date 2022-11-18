@@ -5,7 +5,6 @@ from immudb import ImmudbClient
 
 from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity, link_system_to_tool
-from koala.database.model import system as SystemDB
 from koala.database.model import tool as ToolDB
 from koala.database.model.document import Document as DatabaseDocument
 from koala.database.model.entity import EntityKey
@@ -53,6 +52,8 @@ class Tool(Entity):
         self.gmp_relevant = gmp_relevant
 
 
+# TODO: This class should be split into smaller classes
+# pylint: disable=too-many-public-methods
 class Api:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client

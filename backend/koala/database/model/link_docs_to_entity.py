@@ -4,7 +4,6 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 from .document import DocumentID
-from .system import SystemID
 from .tool import ToolID
 
 

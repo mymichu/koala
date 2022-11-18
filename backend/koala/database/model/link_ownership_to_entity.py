@@ -9,9 +9,9 @@ class LinkeOwnershipToEntity:
 
     def link(self, entity_key: EntityKey, owner_email: str) -> None:
         # TODO: Merge it to one query this is not supported with immudb
-        respEntity = self._client.sqlQuery(
+        resp_entity = self._client.sqlQuery(
             """
-            SELECT entity.id, user.email FROM entity 
+            SELECT entity.id, user.email FROM entity
             INNER JOIN user ON user.email = @owner_email
             WHERE entity.name = @entity_name AND entity.version_major = @entity_version_major AND entity.purpose = @entity_purpose""",
             params={
@@ -21,7 +21,7 @@ class LinkeOwnershipToEntity:
                 "owner_email": owner_email,
             },
         )
-        (entityid, email) = respEntity[0]
+        (entityid, email) = resp_entity[0]
         if email == owner_email:
             self._client.sqlExec(
                 """
