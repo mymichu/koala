@@ -32,19 +32,14 @@ class Document(DocumentID):
             },
         )
 
-
-def get_by(client: ImmudbClient, **kwargs: Any) -> List[DocumentID]:
-    query = "SELECT name, path, creation_date, id FROM document"
-    sep = " WHERE "
-
-    for key, value in kwargs.items():
-        if isinstance(value, str):
-            condition = f"{sep}{key}='{value}'"
-        else:
-            condition = f"{sep}{key}={value}"
-
-        sep = " AND "
-        query += condition
-
-    resp = client.sqlQuery(query)
-    return [DocumentID(*item) for item in resp]
+    def get_id(self) -> int:
+        resp = self._client.sqlQuery(
+            f"""
+            SELECT id FROM document
+            WHERE name='{self.name}'
+            AND path='{self.path}'
+            """
+        )
+        if len(resp) != 1:
+            raise Exception("Document not found")
+        return int(resp[0][0])

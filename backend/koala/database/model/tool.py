@@ -4,7 +4,6 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 from .entity import DataBaseEntity, Entity
-from .entity import get_by as get_entity_by
 
 
 @dataclass
@@ -31,10 +30,24 @@ class Tool(ToolID):
             )
         )
 
-
-def get_by(client: ImmudbClient, **kwargs: Any) -> List[ToolID]:
-    entities = get_entity_by(client, **kwargs)
-    return [ToolID(*item) for item in entities]
+    def get_id(self) -> int:
+        resp = self._client.sqlQuery(
+            """
+                SELECT id FROM entity
+                WHERE name = @name
+                AND version_major = @version_major
+                AND purpose = @purpose
+                AND is_system = FALSE;
+                """,
+            params={
+                "name": self.name,
+                "version_major": self.version_major,
+                "purpose": self.purpose,
+            },
+        )
+        if len(resp) == 1:
+            return int(resp[0][0])
+        raise Exception("Tool not found")
 
 
 def _in(entitylinker: tuple, entity: tuple) -> bool:

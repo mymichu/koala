@@ -54,16 +54,3 @@ class DataBaseEntity:
             },
         )
         return len(resp) == 1
-
-
-def get_by(client: ImmudbClient, **kwargs: Any) -> List:
-    query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
-    sep = " WHERE "
-    for key, value in kwargs.items():
-        if isinstance(value, str):
-            condition = f"{sep}{key}='{value}'"
-        else:
-            condition = f"{sep}{key}={value}"
-        sep = " AND "
-        query += condition
-    return list(client.sqlQuery(query))

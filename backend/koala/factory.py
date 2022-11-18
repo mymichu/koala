@@ -1,7 +1,11 @@
+from xml.dom.minidom import Document
+
 from dependency_injector import containers, providers
 from immudb import ImmudbClient
 
-from koala.api.api import Api
+from koala.api.document import DocumentApi
+from koala.api.system import SystemApi
+from koala.api.tool import ToolApi
 from koala.api.user import UserApi
 from koala.database.setup import DatabaseInitializer
 
@@ -16,8 +20,17 @@ class ContainerDatabase(containers.DeclarativeContainer):
 class ContainerApi(containers.DeclarativeContainer):
     config = providers.Configuration(strict=True)
     immuclient = providers.Dependency(instance_of=ImmudbClient)
-    api_factory = providers.Factory(
-        Api,
+
+    api_document_factory = providers.Factory(
+        DocumentApi,
+        client=immuclient,
+    )
+    api_system_factory = providers.Factory(
+        SystemApi,
+        client=immuclient,
+    )
+    api_tool_factory = providers.Factory(
+        ToolApi,
         client=immuclient,
     )
     api_user_factory = providers.Factory(

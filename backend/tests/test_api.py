@@ -3,7 +3,10 @@ import os
 import pytest
 from dependency_injector import providers
 
-from koala.api.api import Api, Document, System, Tool
+from koala.api.document import DocumentApi
+from koala.api.system import SystemApi
+from koala.api.tool import ToolApi
+from koala.api.types import Document, System, Tool
 from koala.api.user import UserApi, UserData
 from koala.factory import ContainerApi, ContainerDatabase
 
@@ -38,13 +41,14 @@ def koala_api(request):
     client.shutdown()
 
 
+# TODO: PURE SYSTEM API TESTS move to test_system_api.py
 def test_get_all_sdes_returns_none_when_empty(koala_api):
-    api = koala_api.api_factory()
+    api: SystemApi = koala_api.api_system_factory()
     assert api.get_all_systems() == []
 
 
 def test_add_one_sde(koala_api):
-    api = koala_api.api_factory()
+    api: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     api.add_system(esw1)
     all_sdes = api.get_all_systems()
@@ -53,7 +57,7 @@ def test_add_one_sde(koala_api):
 
 
 def test_add_two_sdes_same_name_and_purpose_different_versions(koala_api):
-    api = koala_api.api_factory()
+    api: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     api.add_system(esw1)
 
@@ -64,13 +68,14 @@ def test_add_two_sdes_same_name_and_purpose_different_versions(koala_api):
     assert set(all_sdes) == set([esw1, esw2])
 
 
+# TODO: PURE Tool API TESTS move to test_tool_api.py
 def test_get_all_tools_return_none_when_empty(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     assert api.get_all_tools() == []
 
 
 def test_add_one_tool(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     api.add_tool(gcc)
 
@@ -79,7 +84,7 @@ def test_add_one_tool(koala_api):
 
 
 def test_add_one_tool_with_different_versions(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     gcc10 = Tool(name="gcc", version_major=10, purpose="compiler")
     api.add_tool(gcc10)
 
@@ -97,7 +102,7 @@ def test_add_one_tool_with_different_versions(koala_api):
 
 
 def test_add_one_tool_with_same_version_different_purposes(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
     api.add_tool(clang_host)
 
@@ -109,7 +114,7 @@ def test_add_one_tool_with_same_version_different_purposes(koala_api):
 
 
 def test_add_one_tool_with_different_version_different_purposes(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
     api.add_tool(clang_host)
 
@@ -121,7 +126,7 @@ def test_add_one_tool_with_different_version_different_purposes(koala_api):
 
 
 def test_add_two_tools(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     api.add_tool(gcc)
 
@@ -133,7 +138,7 @@ def test_add_two_tools(koala_api):
 
 
 def test_get_tools_with_given_name_when_one_tool_2_versions_and_purposes(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
     api.add_tool(clang_host)
 
@@ -145,7 +150,7 @@ def test_get_tools_with_given_name_when_one_tool_2_versions_and_purposes(koala_a
 
 
 def test_get_tools_with_given_name_when_one_tool_1_versions_and_2_purposes(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     clang_host = Tool(name="clang", version_major=10, purpose="host compiler")
     api.add_tool(clang_host)
 
@@ -157,85 +162,92 @@ def test_get_tools_with_given_name_when_one_tool_1_versions_and_2_purposes(koala
 
 
 def test_get_tool_for_system_when_empty(koala_api):
-    api = koala_api.api_factory()
+    api: ToolApi = koala_api.api_tool_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     tools = api.get_tools_for_system(esw1)
     assert tools == []
 
 
 def test_link_existing_tool_to_existing_sde(koala_api):
-    api = koala_api.api_factory()
+    api_tool: ToolApi = koala_api.api_tool_factory()
+    api_system: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api.add_system(esw1)
+    api_system.add_system(esw1)
 
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api.add_tool(gcc)
+    api_tool.add_tool(gcc)
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
-    api.add_tool(clang)
+    api_tool.add_tool(clang)
 
-    api.link_tools_to_system(tools=[gcc, clang], system=esw1)
+    api_tool.link_tools_to_system(tools=[gcc, clang], system=esw1)
 
-    tools = api.get_tools_for_system(esw1)
+    tools = api_tool.get_tools_for_system(esw1)
     assert set(tools) == set([gcc, clang])
 
 
+# TODO: System API TESTS move to test_system_api.py
 def test_link_existing_sde_to_existing_tool(koala_api):
-    api = koala_api.api_factory()
+    api_tool: ToolApi = koala_api.api_tool_factory()
+    api_system: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api.add_system(esw1)
+    api_system.add_system(esw1)
 
     project_x = System(name="project x", version_major=1, purpose="building firmware for project X")
-    api.add_system(project_x)
+    api_system.add_system(project_x)
 
     project_y = System(name="project y", version_major=2, purpose="building firmware for project Y")
-    api.add_system(project_y)
+    api_system.add_system(project_y)
 
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api.add_tool(gcc)
+    api_tool.add_tool(gcc)
 
-    api.link_tools_to_system(tools=[gcc], system=esw1)
-    api.link_tools_to_system(tools=[gcc], system=project_x)
+    api_tool.link_tools_to_system(tools=[gcc], system=esw1)
+    api_tool.link_tools_to_system(tools=[gcc], system=project_x)
 
-    systems = api.get_systems_for_tool(gcc)
+    systems = api_system.get_systems_for_tool(gcc)
     assert set(systems) == set([esw1, project_x])
 
 
+# TODO: Tool API TESTS move to tool_api_test.py
 def test_get_all_tools_not_in_any_sde(koala_api):
-    api = koala_api.api_factory()
+    api_tool: ToolApi = koala_api.api_tool_factory()
+    api_system: SystemApi = koala_api.api_system_factory()
+
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api.add_system(esw1)
+    api_system.add_system(esw1)
 
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api.add_tool(gcc)
+    api_tool.add_tool(gcc)
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
-    api.add_tool(clang)
+    api_tool.add_tool(clang)
 
-    api.link_tools_to_system(tools=[gcc], system=esw1)
+    api_tool.link_tools_to_system(tools=[gcc], system=esw1)
 
-    result = api.unlinked_tools()
+    result = api_tool.unlinked_tools()
     assert len(result) == 1
     assert set(result) == set([clang])
 
     ide = Tool(name="ide", version_major=12, purpose="IDE", gmp_relevant=False)
-    api.add_tool(ide)
-    relevant_gmp_tools = api.get_gmp_relevant_tools()
+    api_tool.add_tool(ide)
+    relevant_gmp_tools = api_tool.get_gmp_relevant_tools()
     assert len(relevant_gmp_tools) == 2
     assert set(relevant_gmp_tools) == set([gcc, clang])
 
 
 def test_get_all_non_gmp_relevant_tools(koala_api):
-    api = koala_api.api_factory()
+    api_tool: ToolApi = koala_api.api_tool_factory()
+
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api.add_tool(gcc)
+    api_tool.add_tool(gcc)
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
-    api.add_tool(clang)
+    api_tool.add_tool(clang)
 
     ide = Tool(name="ide", version_major=12, purpose="IDE", gmp_relevant=False)
-    api.add_tool(ide)
-    relevant_non_gmp_tools = api.get_non_gmp_relevant_tools()
+    api_tool.add_tool(ide)
+    relevant_non_gmp_tools = api_tool.get_non_gmp_relevant_tools()
     assert len(relevant_non_gmp_tools) == 1
     assert set(relevant_non_gmp_tools) == set([ide])
 
@@ -269,18 +281,18 @@ def test_get_all_changes_for_given_sde_between_date1_and_date2():
 
 
 def test_get_all_tools_owned_by_given_user(koala_api):
-    api: Api = koala_api.api_factory()
+    api_tool: ToolApi = koala_api.api_tool_factory()
     api_user: UserApi = koala_api.api_user_factory()
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     email_max = "max.muster@email.com"
-    api.add_tool(clang)
-    api.add_tool(gcc)
+    api_tool.add_tool(clang)
+    api_tool.add_tool(gcc)
     api_user.add_user(UserData(name="muster", first_name="max", email="max.muster@email.com"))
-    api.add_tool_owner(tool=clang, owner_email=email_max)
-    api.add_tool_owner(tool=gcc, owner_email=email_max)
-    tools = api.get_all_tools_owned_by(email_max)
+    api_tool.add_tool_owner(tool=clang, owner_email=email_max)
+    api_tool.add_tool_owner(tool=gcc, owner_email=email_max)
+    tools = api_tool.get_all_tools_owned_by(email_max)
     assert len(tools) == 2
     assert set(tools) == set([gcc, clang])
 
@@ -290,7 +302,8 @@ def test_get_all_sdes_owned_by_given_user():
 
 
 def test_get_all_documents_for_given_tool(koala_api):
-    api = koala_api.api_factory()
+    api_tool: ToolApi = koala_api.api_tool_factory()
+    api_document: DocumentApi = koala_api.api_document_factory()
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     spec_a = {"name": "intro", "path": "path/to/intro"}
     spec_b = {"name": "class", "path": "path/to/class"}
@@ -298,33 +311,34 @@ def test_get_all_documents_for_given_tool(koala_api):
     doc_a = Document(**spec_a)
     doc_b = Document(**spec_b)
 
-    api.add_document(doc_a)
-    api.add_document(doc_b)
+    api_document.add_document(doc_a)
+    api_document.add_document(doc_b)
 
-    api.add_tool(clang)
-    api.add_tool_document(clang, doc_a)
-    api.add_tool_document(clang, doc_b)
+    api_tool.add_tool(clang)
+    api_tool.add_tool_document(clang, doc_a)
+    api_tool.add_tool_document(clang, doc_b)
 
-    result = api.get_tool_documents(clang)
+    result = api_tool.get_tool_documents(clang)
     assert set(result) == set(
         [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
     )
 
 
 def test_get_all_documents_for_given_sde(koala_api):
-    api: Api = koala_api.api_factory()
+    api_system: SystemApi = koala_api.api_system_factory()
+    api_document: DocumentApi = koala_api.api_document_factory()
     esw1 = System(name="esw1", version_major=13, purpose="esw1")
     doc_a = Document(name="intro", path="path/to/intro")
     doc_b = Document(name="class", path="path/to/class")
 
-    api.add_document(doc_a)
-    api.add_document(doc_b)
+    api_document.add_document(doc_a)
+    api_document.add_document(doc_b)
 
-    api.add_system(esw1)
-    api.add_system_document(esw1, doc_a)
-    api.add_system_document(esw1, doc_b)
+    api_system.add_system(esw1)
+    api_system.add_system_document(esw1, doc_a)
+    api_system.add_system_document(esw1, doc_b)
 
-    result = api.get_system_documents(esw1)
+    result = api_system.get_system_documents(esw1)
     assert set(result) == set(
         [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
     )

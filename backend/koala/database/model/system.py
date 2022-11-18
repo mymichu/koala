@@ -4,7 +4,6 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 from .entity import DataBaseEntity, Entity
-from .entity import get_by as get_entity_by
 
 
 @dataclass
@@ -44,14 +43,9 @@ class System(SystemID):
                 "purpose": self.purpose,
             },
         )
-        if len(resp) == 1:
-            return int(resp[0][0])
-        return -1
-
-
-def get_by(client: ImmudbClient, **kwargs: Any) -> List[SystemID]:
-    entities = get_entity_by(client, **kwargs)
-    return [SystemID(*item) for item in entities]
+        if len(resp) != 1:
+            raise Exception("System not found")
+        return int(resp[0][0])
 
 
 class SystemMonitor:

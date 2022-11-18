@@ -34,46 +34,48 @@ class LinkDocEntity(LinkDocEntityID):
         )
 
 
-def get_by(client: ImmudbClient, **kwargs: Any) -> List[LinkDocEntityID]:
-    query = "SELECT document_id, entity_id, id FROM entity_x_document"
-    sep = " WHERE "
+class LinkDocEntityMonitor:
+    def __init__(self, client: ImmudbClient):
+        self._client = client
 
-    for key, value in kwargs.items():
-        if isinstance(value, str):
-            condition = f"{sep}{key}='{value}'"
-        else:
-            condition = f"{sep}{key}={value}"
+    def get_by(self, **kwargs: Any) -> List[LinkDocEntityID]:
+        query = "SELECT document_id, entity_id, id FROM entity_x_document"
+        sep = " WHERE "
 
-        sep = " AND "
-        query += condition
+        for key, value in kwargs.items():
+            if isinstance(value, str):
+                condition = f"{sep}{key}='{value}'"
+            else:
+                condition = f"{sep}{key}={value}"
 
-    resp = client.sqlQuery(query)
-    return [LinkDocEntityID(*item) for item in resp]
+            sep = " AND "
+            query += condition
 
+        resp = self._client.sqlQuery(query)
+        return [LinkDocEntityID(*item) for item in resp]
 
-def get_linked_to_systems(client: ImmudbClient, system_id: int) -> List[DocumentID]:
-    docs_linked = client.sqlQuery(
-        """
-        SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
-        INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
-        WHERE linker.entity_id = @system_id
-        """,
-        params={
-            "system_id": system_id,
-        },
-    )
-    return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
+    def get_linked_to_systems(self, system_id: int) -> List[DocumentID]:
+        docs_linked = self._client.sqlQuery(
+            """
+            SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
+            INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+            WHERE linker.entity_id = @system_id
+            """,
+            params={
+                "system_id": system_id,
+            },
+        )
+        return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
 
-
-def get_linked_to_tools(client: ImmudbClient, tool: ToolID) -> List[DocumentID]:
-    docs_linked = client.sqlQuery(
-        """
-        SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
-        INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
-        WHERE linker.entity_id = @tool_id
-        """,
-        params={
-            "tool_id": tool.identity,
-        },
-    )
-    return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
+    def get_linked_to_tools(self, tool_id: int) -> List[DocumentID]:
+        docs_linked = self._client.sqlQuery(
+            """
+            SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
+            INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+            WHERE linker.entity_id = @tool_id
+            """,
+            params={
+                "tool_id": tool_id,
+            },
+        )
+        return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
