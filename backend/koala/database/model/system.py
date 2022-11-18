@@ -45,7 +45,7 @@ class System(SystemID):
             },
         )
         if len(resp) == 1:
-            return resp[0][0]
+            return int(resp[0][0])
         return -1
 
 

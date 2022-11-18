@@ -9,8 +9,8 @@ from koala.database.setup import DatabaseInitializer
 # pylint: disable=no-member
 class ContainerDatabase(containers.DeclarativeContainer):
     config = providers.Configuration(strict=True)
-    immuclient = providers.Singleton(ImmudbClient, config.database.url)
-    database = providers.Singleton(DatabaseInitializer, immuclient, config.database.name)
+    immuclient: providers.Singleton = providers.Singleton(ImmudbClient, config.database.url)
+    database: providers.Singleton = providers.Singleton(DatabaseInitializer, immuclient, config.database.name)
 
 
 class ContainerApi(containers.DeclarativeContainer):
