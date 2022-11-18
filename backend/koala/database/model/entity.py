@@ -5,15 +5,19 @@ from typing import Any, List
 from immudb import ImmudbClient
 
 
-@dataclass(unsafe_hash=True)
-class Entity:
+@dataclass
+class EntityKey:
     name: str
     version_major: int
     purpose: str
-    is_system: bool
+
+
+@dataclass
+class Entity(EntityKey):
+    is_system: bool = False
     gmp_relevant: bool = True
     change_at: datetime = datetime.now()
-    identity: int = 0
+    identity: int = -1
 
 
 class DataBaseEntity:

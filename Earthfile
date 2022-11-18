@@ -16,7 +16,7 @@ install:
 check:
     FROM +install
     RUN poetry run isort . --check
-    RUN poetry run pylint koala
+    RUN poetry run pylint koala --reports=y
     RUN poetry run black . --check
     RUN poetry run flake8 koala
     RUN poetry run mypy .

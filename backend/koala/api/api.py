@@ -5,20 +5,20 @@ from immudb import ImmudbClient
 
 from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity, link_system_to_tool
-from koala.database.model import system as SystemDB
 from koala.database.model import tool as ToolDB
 from koala.database.model.document import Document as DatabaseDocument
+from koala.database.model.entity import EntityKey
 from koala.database.model.link_docs_to_entity import (
     LinkDocEntity as DatabaseLinkDocEntity,
 )
+from koala.database.model.link_ownership_to_entity import LinkeOwnershipToEntity
 from koala.database.model.link_system_to_tool import (
     LinkSystemTool as DatabaseLinkSystemTool,
 )
 from koala.database.model.system import System as DataBaseSystem
-from koala.database.model.system import SystemID
+from koala.database.model.system import SystemID, SystemMonitor
 from koala.database.model.tool import Tool as DatabaseTool
-from koala.database.model.tool import ToolID
-from koala.database.monitor import Monitor as DataBaseMonitor
+from koala.database.model.tool import ToolID, ToolMonitor
 
 
 @dataclass(unsafe_hash=True)
@@ -52,12 +52,14 @@ class Tool(Entity):
         self.gmp_relevant = gmp_relevant
 
 
+# TODO: This class should be split into smaller classes
+# pylint: disable=too-many-public-methods
 class Api:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client
 
     def get_all_systems(self) -> List[System]:
-        monitor_database = DataBaseMonitor(self._client)
+        monitor_database = SystemMonitor(self._client)
         systems_database = monitor_database.get_all_systems()
         systems: List[System] = []
         for system_db in systems_database:
@@ -89,14 +91,10 @@ class Api:
             name=document.name,
             path=document.path,
         )
-        sys_db = SystemDB.get_by(
-            self._client,
-            name=system.name,
-            version_major=system.version_major,
-            purpose=system.purpose,
-        )
 
-        if len(sys_db) != 1:
+        system_db_id = DataBaseSystem(self._client, system.name, system.version_major, system.purpose).get_id()
+
+        if system_db_id < 1:
             raise Exception("Ambigious system")
 
         if len(doc_db) != 1:
@@ -105,22 +103,22 @@ class Api:
         link = DatabaseLinkDocEntity(
             self._client,
             doc_db[0].identity,
-            sys_db[0].identity,
+            system_db_id,
         )
         link.add()
 
     def get_system_documents(self, system: System) -> List[Document]:
-        sys_db = SystemDB.get_by(
+        sys_db = DataBaseSystem(
             self._client,
             name=system.name,
             version_major=system.version_major,
             purpose=system.purpose,
         )
-
-        if len(sys_db) != 1:
+        sys_db_id = sys_db.get_id()
+        if sys_db_id < 1:
             raise Exception("Ambigious system")
 
-        docs_db = link_docs_to_entity.get_linked_to_systems(self._client, sys_db[0])
+        docs_db = link_docs_to_entity.get_linked_to_systems(self._client, sys_db_id)
 
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
 
@@ -180,12 +178,12 @@ class Api:
         return tools
 
     def get_gmp_relevant_tools(self) -> List[Tool]:
-        monitor_database = DataBaseMonitor(self._client)
+        monitor_database = ToolMonitor(self._client)
         tool_database = monitor_database.get_gmp_relevant_tools()
         return self._convert_to(Tool, tool_database)
 
     def get_non_gmp_relevant_tools(self) -> List[Tool]:
-        monitor_database = DataBaseMonitor(self._client)
+        monitor_database = ToolMonitor(self._client)
         tool_database = monitor_database.get_non_gmp_relevant_tools()
         return self._convert_to(Tool, tool_database)
 
@@ -193,17 +191,17 @@ class Api:
         pass
 
     def unlinked_tools(self) -> List[Tool]:
-        monitor_database = DataBaseMonitor(self._client)
+        monitor_database = ToolMonitor(self._client)
         tool_database = monitor_database.unlinked_tools()
         return self._convert_to(Tool, tool_database)
 
     def get_all_tools(self) -> List[Tool]:
-        monitor_database = DataBaseMonitor(self._client)
+        monitor_database = ToolMonitor(self._client)
         tool_database = monitor_database.get_all_tools()
         return self._convert_to(Tool, tool_database)
 
     def get_tools(self, name: str) -> List[Tool]:
-        monitor_database = DataBaseMonitor(self._client)
+        monitor_database = ToolMonitor(self._client)
         tool_database = monitor_database.get_tools(name)
         return self._convert_to(Tool, tool_database)
 
@@ -227,3 +225,12 @@ class Api:
             tool_db = ToolID(tool.name, tool.version_major, tool.purpose)
             link = DatabaseLinkSystemTool(self._client, system_db, tool_db)
             link.add()
+
+    def add_tool_owner(self, tool: Tool, owner_email: str) -> None:
+        linker = LinkeOwnershipToEntity(self._client)
+        entitiy = EntityKey(tool.name, tool.version_major, tool.purpose)
+        linker.link(entitiy, owner_email)
+
+    def get_all_tools_owned_by(self, owner_email: str) -> List[Tool]:
+        list_tools = ToolMonitor(self._client).get_all_tools_owned_by(owner_email)
+        return self._convert_to(Tool, list_tools)
