@@ -42,7 +42,7 @@ class DatabaseInitializer:
                 changed_at TIMESTAMP,
                 is_system BOOLEAN,
                 gmp_relevant BOOLEAN,
-                PRIMARY KEY (id)
+                PRIMARY KEY id
                 );"""
         )
 
@@ -75,6 +75,29 @@ class DatabaseInitializer:
                 document_id INTEGER,
                 entity_id INTEGER,
                 creation_date TIMESTAMP,
+                PRIMARY KEY id
+                );"""
+        )
+
+        self._client.sqlExec(
+            """
+            CREATE TABLE IF NOT EXISTS user (
+                name VARCHAR[256],
+                first_name VARCHAR[256],
+                email VARCHAR[256],
+                active BOOLEAN,
+                created_at TIMESTAMP,
+                PRIMARY KEY email
+                );"""
+        )
+
+        self._client.sqlExec(
+            """
+            CREATE TABLE IF NOT EXISTS entity_ownership (
+                id INTEGER AUTO_INCREMENT,
+                entity_id INTEGER,
+                owner_email VARCHAR[256],
+                active BOOLEAN,
                 PRIMARY KEY id
                 );"""
         )

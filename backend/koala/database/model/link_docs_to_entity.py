@@ -52,7 +52,7 @@ def get_by(client: ImmudbClient, **kwargs: Any) -> List[LinkDocEntityID]:
     return [LinkDocEntityID(*item) for item in resp]
 
 
-def get_linked_to_systems(client: ImmudbClient, system: SystemID) -> List[DocumentID]:
+def get_linked_to_systems(client: ImmudbClient, system_id: int) -> List[DocumentID]:
     docs_linked = client.sqlQuery(
         """
         SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
@@ -60,7 +60,7 @@ def get_linked_to_systems(client: ImmudbClient, system: SystemID) -> List[Docume
         WHERE linker.entity_id = @system_id
         """,
         params={
-            "system_id": system.identity,
+            "system_id": system_id,
         },
     )
     return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
