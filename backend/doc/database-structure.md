@@ -38,6 +38,8 @@ classDiagram
         +id (Autoincrement)
         +entity_name
         +entity_major_version
+        +requester_id
+        +reviewer_id
         +change
     }
     class document{
