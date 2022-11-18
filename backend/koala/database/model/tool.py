@@ -118,7 +118,7 @@ class ToolMonitor:
             """,
             params={"user_email": email},
         )
-        tools = List[ToolID]()
+        tools:List[ToolID] = list()
         for item in resp:
             (entity_id, name, version_major, purpose, changed_at, is_system, gmp_relevant) = item
             tool = ToolID(

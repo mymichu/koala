@@ -226,7 +226,7 @@ class Api:
             link = DatabaseLinkSystemTool(self._client, system_db, tool_db)
             link.add()
 
-    def add_tool_owner(self, tool: ToolID, owner_email: str) -> None:
+    def add_tool_owner(self, tool: Tool, owner_email: str) -> None:
         linker = LinkeOwnershipToEntity(self._client)
         entitiy = EntityKey(tool.name, tool.version_major, tool.purpose)
         linker.link(entitiy, owner_email)
