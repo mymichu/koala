@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import List
 
 from immudb import ImmudbClient
 
 from .entity import DataBaseEntity, Entity
-from .entity import get_by as get_entity_by
 
 
 @dataclass
@@ -19,22 +18,21 @@ class Tool(ToolID):
     ) -> None:
         super().__init__(name=name, version_major=version_major, purpose=purpose, gmp_relevant=gmp_relevant)
         self._client = client
-        self._entity = DataBaseEntity(client=client)
-
-    def add(self) -> None:
-        self._entity.insert(
-            ToolID(
-                name=self.name,
-                version_major=self.version_major,
-                purpose=self.purpose,
-                gmp_relevant=self.gmp_relevant,
-            )
+        self._entity = DataBaseEntity(
+            client=client,
+            entity=ToolID(
+                name=name,
+                version_major=version_major,
+                purpose=purpose,
+                gmp_relevant=gmp_relevant,
+            ),
         )
 
+    def add(self) -> None:
+        self._entity.insert()
 
-def get_by(client: ImmudbClient, **kwargs: Any) -> List[ToolID]:
-    entities = get_entity_by(client, **kwargs)
-    return [ToolID(*item) for item in entities]
+    def get_id(self) -> int:
+        return self._entity.get_id()
 
 
 def _in(entitylinker: tuple, entity: tuple) -> bool:

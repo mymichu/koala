@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -21,10 +20,11 @@ class Entity(EntityKey):
 
 
 class DataBaseEntity:
-    def __init__(self, client: ImmudbClient) -> None:
+    def __init__(self, client: ImmudbClient, entity: Entity) -> None:
         self._client = client
+        self._entity = entity
 
-    def insert(self, entiy: Entity) -> None:
+    def insert(self) -> None:
         self._client.sqlExec(
             """
         BEGIN TRANSACTION;
@@ -33,37 +33,30 @@ class DataBaseEntity:
         COMMIT;
         """,
             params={
-                "name": entiy.name,
-                "version_major": entiy.version_major,
-                "purpose": entiy.purpose,
-                "is_system": entiy.is_system,
-                "gmp_relevant": entiy.gmp_relevant,
+                "name": self._entity.name,
+                "version_major": self._entity.version_major,
+                "purpose": self._entity.purpose,
+                "is_system": self._entity.is_system,
+                "gmp_relevant": self._entity.gmp_relevant,
             },
         )
 
-    def is_valid(self, name: str, version_major: int) -> bool:
+    def get_id(self) -> int:
         resp = self._client.sqlQuery(
             """
-        SELECT * FROM entity
-        WHERE name = @name
-        AND version_major = @version_major;
-        """,
+                SELECT id FROM entity
+                WHERE name = @name
+                AND version_major = @version_major
+                AND purpose = @purpose
+                AND is_system = @is_system;
+                """,
             params={
-                "name": name,
-                "version_major": version_major,
+                "name": self._entity.name,
+                "version_major": self._entity.version_major,
+                "purpose": self._entity.purpose,
+                "is_system": self._entity.is_system,
             },
         )
-        return len(resp) == 1
-
-
-def get_by(client: ImmudbClient, **kwargs: Any) -> List:
-    query = "SELECT name, version_major, purpose, is_system, gmp_relevant, changed_at, id FROM entity"
-    sep = " WHERE "
-    for key, value in kwargs.items():
-        if isinstance(value, str):
-            condition = f"{sep}{key}='{value}'"
-        else:
-            condition = f"{sep}{key}={value}"
-        sep = " AND "
-        query += condition
-    return list(client.sqlQuery(query))
+        if len(resp) != 1:
+            raise Exception("Entity not found")
+        return int(resp[0][0])

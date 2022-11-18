@@ -32,5 +32,5 @@ test:
     COPY .devcontainer .devcontainer
     WITH DOCKER --compose .devcontainer/docker-compose.yml \
         --service database
-        RUN poetry run pytest
+        RUN poetry run pytest --md-report --md-report-verbose=1
     END
