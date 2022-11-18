@@ -3,9 +3,9 @@ import os
 import pytest
 from dependency_injector import providers
 
-from koala.factory import ContainerApi, ContainerDatabase
 from koala.api.api import Api, Document, System, Tool
 from koala.api.user import UserApi, UserData
+from koala.factory import ContainerApi, ContainerDatabase
 
 host = os.getenv("IMMUDB_HOST", "database")
 print(f"DATABASE: {host}")

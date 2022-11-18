@@ -1,8 +1,9 @@
 from dependency_injector import containers, providers
 from immudb import ImmudbClient
-from koala.database.setup import DatabaseInitializer
-from koala.api.user import UserApi
+
 from koala.api.api import Api
+from koala.api.user import UserApi
+from koala.database.setup import DatabaseInitializer
 
 
 class ContainerDatabase(containers.DeclarativeContainer):
