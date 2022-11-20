@@ -1,5 +1,31 @@
 # Requester
 
+
+```mermaid
+flowchart
+InitialRequest[Requester ask for a new tool] --> IsPartOfSDE[Is part of one SDE?]
+IsPartOfSDE -- "yes" --> IsToolAlreadyLinked[Is The tool already linked to this SDE?]
+IsToolAlreadyLinked -- "no" --> IsValidSDE[Is The SDE valid?]
+IsToolAlreadyLinked -- "yes" --> CloseChangeCR
+IsValidSDE -- "yes" --> ValidSDE[Is adding the tool changing the purpose of the SDE?]
+ValidSDE -- "no" --> D
+ValidSDE -- "yes" --> K
+IsValidSDE -- "no" --> D
+IsPartOfSDE -- "no" --> D["Create a Change Request with Status Open"]
+D --> E["Does the reviewer accept the change?"]
+E -- "no" --> CloseChangeCR
+E -- "yes" --> ExistingTool[Is the tool already exist in Inventory?]
+ExistingTool -- "yes" --> CheckExistingToolPurpose["Is existing tool purpose match submitted purpose?"]
+CheckExistingToolPurpose -- "no" --> F
+CheckExistingToolPurpose -- "yes" --> LinkToolToSDE["Link Tool to SDE if any"]
+ExistingTool -- "no" --> F[Create a tool in Inventory]
+F[Create a tool in Inventory] --> InvalidTool[Tool with Invalid state]
+InvalidTool --> LinkToolToSDE
+LinkToolToSDE --> H[Link Change Request and the Tool]
+H --> CloseChangeCR[Reviewer changes Change Request status to Closed]
+CloseChangeCR --> Notif[Requester gets notified]
+```
+
 Change Reqest:
 - Tool, Version, Purpose
 
@@ -10,7 +36,7 @@ Change Reqest:
 3.2. Change Request with Status "Closed"
 4. Reviewer approves the change request
 4.1 Reviewer creates Tool in Inventory and links the change request to the tool ID
-4.2 The Tool has state invalid 
+4.2 The Tool has state invalid
 4.3 Change Request with Status "Closed"
 4.4 Requester gets notified about the change
 
@@ -20,20 +46,20 @@ Requester ask for a new tool not in the Software inventory with SDE Invalid
 
 1. Requester ask for a new tool with SDE Number
 2. Create a Change Request with Status "Open"
-3. Reviewer checks 
+3. Reviewer checks
    1. Check if SDE is invalid
    2. Check if Tool is already linked
    3. Check Purpose of the SDE if adding the tool does not change anything
 4. No -> Create a new Tool in the Software Inventory
 5. link the Tool to the SDE
 6. SDE is still invalid
-7. links the change request to the tool, SDE 
-8. The Tool has state invalid 
+7. links the change request to the tool, SDE
+8. The Tool has state invalid
 9. Change Request with Status "Closed"
 
 Requester ask to use an existing tool in the Software inventory for an invalid SDE
 
-1. Requester ask to use this tool in the SDE X 
+1. Requester ask to use this tool in the SDE X
 2. Create a Change Request with Status "Open"
 3. Reviewer checks
    1. Check if SDE X is invalid
@@ -50,6 +76,6 @@ Requester ask to replace a tool with a non existing tool in the Software invento
    1. Set the SDE X to invalid
    2. Remove the Tool A from the SDE X
    3. Add the Tool B to the SDE X
-   
+
 
 Requester ask for a update BuildAgent not in the Software inventory which is used by multiple SDEs
