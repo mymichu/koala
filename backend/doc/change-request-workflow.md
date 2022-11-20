@@ -5,14 +5,16 @@
 flowchart
 InitialRequest[Requester ask for a new tool] --> IsPartOfSDE[Is part of one SDE?]
 IsPartOfSDE -- "yes" --> IsToolAlreadyLinked[Is The tool already linked to this SDE?]
-IsToolAlreadyLinked -- "no" --> IsValidSDE[Is The SDE valid?]
+IsToolAlreadyLinked -- "no" --> CreateCR["Create a Change Request with Status Open"]
+CreateCR --> IsValidSDE[Is The SDE valid?]
 IsToolAlreadyLinked -- "yes" --> CloseChangeCR
 IsValidSDE -- "yes" --> ValidSDE[Is adding the tool changing the purpose of the SDE?]
-ValidSDE -- "no" --> D
-ValidSDE -- "yes" --> K
-IsValidSDE -- "no" --> D
-IsPartOfSDE -- "no" --> D["Create a Change Request with Status Open"]
-D --> E["Does the reviewer accept the change?"]
+ValidSDE -- "no" --> E
+ValidSDE -- "yes" --> CreateNewSDE
+CreateNewSDE --> NewInvalidSDE
+NewInvalidSDE --> E
+IsValidSDE -- "no" --> E
+IsPartOfSDE -- "no" --> E["Does the reviewer accept the change?"]
 E -- "no" --> Refused[Change Request with status Refused]
 Refused --> CloseChangeCR
 E -- "yes" --> Accepted[Change Request with status Accepted]
