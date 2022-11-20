@@ -13,8 +13,10 @@ ValidSDE -- "yes" --> K
 IsValidSDE -- "no" --> D
 IsPartOfSDE -- "no" --> D["Create a Change Request with Status Open"]
 D --> E["Does the reviewer accept the change?"]
-E -- "no" --> CloseChangeCR
-E -- "yes" --> ExistingTool[Is the tool already exist in Inventory?]
+E -- "no" --> Refused[Change Request with status Refused]
+Refused --> CloseChangeCR
+E -- "yes" --> Accepted[Change Request with status Accepted]
+Accepted --> ExistingTool[Is the tool already exist in Inventory?]
 ExistingTool -- "yes" --> CheckExistingToolPurpose["Is existing tool purpose match submitted purpose?"]
 CheckExistingToolPurpose -- "no" --> F
 CheckExistingToolPurpose -- "yes" --> LinkToolToSDE["Link Tool to SDE if any"]
