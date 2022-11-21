@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "koala-system-test"
+version = "0.1.0"
+description = ""
+authors = ["Michel Meyer <meyer_michel@outlook.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "7.1.2"
+requests = "^2.28.1"
+pytest-md-report = "^0.3.0"
+
+
+
+

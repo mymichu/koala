@@ -29,6 +29,7 @@ class Documents(BaseModel):
     path: str
 
 
+# pylint: disable=duplicate-code
 class SystemStatus(BaseModel):
     released_documents: int
     unreleased_documents: int
@@ -81,7 +82,7 @@ async def create_system(
 @inject
 async def get_system_status(
     identity: int, system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory])
-) -> List[Document]:
+) -> SystemStatus:
     system_api_model: SystemStatusApi = system_api.get_system_status(identity)
     return SystemStatus(
         released_documents=system_api_model.released_documents,

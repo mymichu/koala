@@ -71,6 +71,6 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry.scripts]
-koala= "koala.main:main"
+koala= "koala.__main__:main"
 
 
