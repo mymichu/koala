@@ -49,7 +49,7 @@ ignore_missing_imports = true
 [tool.pylint.format]
 max-line-length = 200
 disable = ["too-few-public-methods"]
-extension-pkg-whitelist= ["dependency_injector.containers", "dependency_injector.providers"]
+extension-pkg-whitelist= ["dependency_injector.containers", "dependency_injector.providers", "pydantic"]
 
 [tool.pylint.messages_control]
 disable = ''',

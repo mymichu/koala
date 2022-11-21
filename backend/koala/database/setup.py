@@ -45,7 +45,7 @@ class DatabaseInitializer:
                 PRIMARY KEY id
                 );"""
         )
-        
+
         self._client.sqlExec(
             """
             CREATE UNIQUE INDEX ON entity(name,version_major,purpose);
