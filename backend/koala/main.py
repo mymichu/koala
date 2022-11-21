@@ -10,8 +10,8 @@ from koala.factory import ContainerApi, ContainerDatabase
 host = os.getenv("IMMUDB_HOST", "database")
 print(f"DATABASE: {host}")
 URL = f"{host}:3322"
-USERNAME = "immudb"
-PASSWORD = "immudb"
+USERNAME = os.getenv("IMMUDB_USR", "immudb")
+PASSWORD = os.getenv("IMMUDB_PW", "immudb")
 
 
 def create_application() -> FastAPI:
