@@ -13,9 +13,10 @@ class DocumentID:
     is_released: bool = False
 
 
+# pylint: disable=too-many-arguments
 class Document(DocumentID):
     def __init__(
-        self, client: ImmudbClient, name: str = "", path: str = "", identity=-1, released: bool = False
+        self, client: ImmudbClient, name: str = "", path: str = "", identity: int = -1, released: bool = False
     ) -> None:
         super().__init__(name=name, path=path, identity=identity, is_released=released)
         self._client = client
@@ -35,13 +36,13 @@ class Document(DocumentID):
             },
         )
 
-    def _check_name_path(self):
+    def _check_name_path(self) -> None:
         if len(self.name) == 0:
             raise ValueError("Document name cannot be empty")
         if len(self.path) == 0:
             raise ValueError("Document path cannot be empty")
 
-    def _check_id(self):
+    def _check_id(self) -> None:
         if self.identity == -1:
             raise ValueError("Document ID not set")
 

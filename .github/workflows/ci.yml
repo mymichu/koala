@@ -35,3 +35,7 @@ jobs:
       run: earthly --ci +build
     - name: Run integration test
       run: earthly --ci -P +test
+    - name: integrate koala in docker image
+      run: earthly +docker-app
+    - name: Run System test
+      run: earthly --ci -P +sys-test
