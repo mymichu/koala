@@ -65,11 +65,11 @@ def test_get_all_documents_for_given_sde(koala_api):
     api_document.add_document(doc_a)
     api_document.add_document(doc_b)
 
-    api_system.add_system(esw1)
+    esw1_database = api_system.add_system(esw1)
     api_system.add_system_document(esw1, doc_a)
     api_system.add_system_document(esw1, doc_b)
 
-    result = api_system.get_system_documents(esw1)
+    result = api_system.get_system_documents(esw1_database.identity)
     assert set(result) == set(
         [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
     )
