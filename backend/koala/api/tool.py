@@ -17,7 +17,7 @@ class ToolApi:
         self._client = client
 
     def _convert(self, tools: List[ToolDB.ToolID]) -> List[Tool]:
-        return [Tool(tool.name, tool.version_major, tool.purpose, tool.gmp_relevant) for tool in tools]
+        return [Tool(tool.name, tool.version_major, tool.purpose, tool.identity, tool.gmp_relevant) for tool in tools]
 
     def get_gmp_relevant_tools(self) -> List[Tool]:
         monitor_database = ToolDB.ToolMonitor(self._client)
