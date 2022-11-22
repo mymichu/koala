@@ -56,7 +56,7 @@ class LinkDocEntityMonitor:
     def get_linked_to_systems(self, system_id: int) -> List[DocumentID]:
         docs_linked = self._client.sqlQuery(
             """
-            SELECT doc.name, doc.path, doc.creation_date, doc.id FROM document as doc
+            SELECT doc.name, doc.path, doc.creation_date, doc.id, doc.is_released FROM document as doc
             INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
             WHERE linker.entity_id = @system_id
             """,
@@ -64,7 +64,10 @@ class LinkDocEntityMonitor:
                 "system_id": system_id,
             },
         )
-        return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
+        return [
+            DocumentID(name, path, creation_date, id, is_released)
+            for (name, path, creation_date, id, is_released) in docs_linked
+        ]
 
     def get_linked_to_tools(self, tool_id: int) -> List[DocumentID]:
         docs_linked = self._client.sqlQuery(
@@ -78,3 +81,20 @@ class LinkDocEntityMonitor:
             },
         )
         return [DocumentID(name, path, creation_date, id) for (name, path, creation_date, id) in docs_linked]
+
+    def get_amount_of_documents_of_entity(self, tool_id: int, is_released: bool) -> int:
+        resp = self._client.sqlQuery(
+            """
+            SELECT COUNT(*) FROM document as doc
+            INNER JOIN entity_x_document as linker ON linker.document_id = doc.id
+            WHERE linker.entity_id = @tool_id AND doc.is_released = @is_released
+            """,
+            params={
+                "tool_id": tool_id,
+                "is_released": is_released,
+            },
+        )
+        if len(resp) != 1:
+            raise Exception("Query returned more than one result")
+        amount = resp[0][0]
+        return int(amount)

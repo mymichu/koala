@@ -47,9 +47,11 @@ class ToolApi:
         tool_database = monitor_database.get_tools(name)
         return self._convert(tool_database)
 
-    def add_tool(self, tool: Tool) -> None:
+    def add_tool(self, tool: Tool) -> Tool:
         tool_database = ToolDB.Tool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
         tool_database.add()
+        tool.identity = tool_database.get_id()
+        return tool
 
     def get_tools_for_system(self, system: System) -> List[Tool]:
         system_db = SystemDB.System(self._client, system.name, system.version_major, system.purpose)

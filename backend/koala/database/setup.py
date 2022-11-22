@@ -41,6 +41,7 @@ class DatabaseInitializer:
                 purpose VARCHAR[64],
                 changed_at TIMESTAMP,
                 is_system BOOLEAN,
+                is_active BOOLEAN,
                 gmp_relevant BOOLEAN,
                 PRIMARY KEY id
                 );"""
