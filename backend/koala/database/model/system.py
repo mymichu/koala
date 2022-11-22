@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -37,10 +37,27 @@ class SystemMonitor:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client
 
+    # The order of the columns matters: id, name, version_major, purpose, changed_at, gmp_relevant
+    def _convert_query_system_id(self, resp: Any) -> List[SystemID]:
+        systems: List[SystemID] = []
+        for item in resp:
+            (identiy, name, version_major, purpose, changed_at, gmp_relevant) = item
+            system = SystemID(
+                name=name,
+                version_major=version_major,
+                purpose=purpose,
+                change_at=changed_at,
+                gmp_relevant=gmp_relevant,
+                identity=identiy,
+            )
+            systems.append(system)
+        return systems
+
     def get_all_systems(self) -> List[SystemID]:
         resp = self._client.sqlQuery(
             """
-        SELECT name, version_major, purpose FROM entity WHERE is_system = TRUE;
+        SELECT id, name, version_major, purpose, changed_at, gmp_relevant FROM entity WHERE is_system = TRUE;
         """
         )
-        return list(map(lambda x: SystemID(*x), resp))
+
+        return self._convert_query_system_id(resp)

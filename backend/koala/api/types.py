@@ -18,6 +18,7 @@ class Entity:
     name: str
     version_major: int
     purpose: str
+    identity: int = -1
 
 
 class System(Entity):
