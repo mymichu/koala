@@ -62,3 +62,10 @@ class SystemApi:
         docs_db = linker.get_linked_to_systems(system_id)
 
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
+
+    def get_system_status(self, system: System) -> str:
+        system_db = SystemDB.System(self._client, system.name, system.version_major, system.purpose)
+        documents = system_db.get_system_document_status()
+        change_tickets = system_db.get_system_change_ticket_status()
+        tools = system_db.get_all_tools()
+        return system_db.get_status()

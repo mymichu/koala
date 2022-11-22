@@ -70,6 +70,7 @@ class DatabaseInitializer:
                 name VARCHAR[256],
                 path VARCHAR[256],
                 creation_date TIMESTAMP,
+                is_released BOOLEAN,
                 PRIMARY KEY id
                 );"""
         )
