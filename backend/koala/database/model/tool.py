@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -70,13 +70,30 @@ class ToolMonitor:
 
         return list(map(lambda x: ToolID(*x), resp))
 
+    # The order of the columns matters: id, name, version_major, purpose, changed_at, is_system, gmp_relevant
+    def _convert_query_tool_id(self, resp: Any) -> List[ToolID]:
+        tools: List[ToolID] = []
+        for item in resp:
+            (identiy, name, version_major, purpose, changed_at, is_system, gmp_relevant) = item
+            tool = ToolID(
+                name=name,
+                version_major=version_major,
+                purpose=purpose,
+                is_system=is_system,
+                gmp_relevant=gmp_relevant,
+                change_at=changed_at,
+                identity=identiy,
+            )
+            tools.append(tool)
+        return tools
+
     def get_all_tools(self) -> List[ToolID]:
         resp = self._client.sqlQuery(
             """
-        SELECT name, version_major, purpose FROM entity WHERE is_system = FALSE;
+        SELECT id, name, version_major, purpose, changed_at, is_system, gmp_relevant FROM entity WHERE is_system = FALSE;
         """
         )
-        return list(map(lambda x: ToolID(*x), resp))
+        return self._convert_query_tool_id(resp)
 
     def get_tools(self, name: str) -> List[ToolID]:
         resp = self._client.sqlQuery(
@@ -116,18 +133,5 @@ class ToolMonitor:
             """,
             params={"user_email": email},
         )
-        tools: List[ToolID] = []
-        for item in resp:
-            (entity_id, name, version_major, purpose, changed_at, is_system, gmp_relevant) = item
-            tool = ToolID(
-                name=name,
-                version_major=version_major,
-                purpose=purpose,
-                is_system=is_system,
-                gmp_relevant=gmp_relevant,
-                change_at=changed_at,
-                identity=entity_id,
-            )
-            tools.append(tool)
 
-        return tools
+        return self._convert_query_tool_id(resp)
