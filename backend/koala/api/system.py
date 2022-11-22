@@ -19,7 +19,9 @@ class SystemApi:
         self._client = client
 
     def _convert(self, systems: List[SystemDB.SystemID]) -> List[System]:
-        return [System(system.name, system.version_major, system.purpose) for system in systems]
+        return [
+            System(system.name, system.version_major, system.purpose, identity=system.identity) for system in systems
+        ]
 
     def get_all_systems(self) -> List[System]:
         monitor_database = SystemDB.SystemMonitor(self._client)
