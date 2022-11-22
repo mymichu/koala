@@ -1,10 +1,20 @@
 from dataclasses import dataclass
 
 
-@dataclass(unsafe_hash=True)
+@dataclass()
 class Document:
     name: str
     path: str
+    identity: int = -1
+
+    # exclude identity from equality
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Document):
+            raise TypeError("Can only compare Document with Document")
+        return self.name == other.name and self.path == other.path
+
+    def __hash__(self) -> int:
+        return hash((self.name, self.path))
 
 
 @dataclass(unsafe_hash=True)
@@ -23,7 +33,7 @@ class Entity:
     # exclude identity from equality
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
-            raise TypeError("Can only compare Tool with Tool")
+            raise TypeError("Can only compare Entity with Entity")
         return self.name == other.name and self.version_major == other.version_major and self.purpose == other.purpose
 
     def __hash__(self) -> int:

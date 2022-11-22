@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List
 
 from immudb import ImmudbClient
@@ -12,6 +13,16 @@ from koala.database.model.link_docs_to_entity import (
 )
 
 from .types import Document, System
+
+
+@dataclass
+class SystemStatus:
+    released_documents: int
+    unreleased_documents: int
+    released_tools: int
+    unreleased_tools: int
+    closed_change_requests: int
+    open_change_requests: int
 
 
 class SystemApi:
@@ -63,9 +74,8 @@ class SystemApi:
 
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
 
-    def get_system_status(self, system: System) -> str:
-        system_db = SystemDB.System(self._client, system.name, system.version_major, system.purpose)
-        documents = system_db.get_system_document_status()
-        change_tickets = system_db.get_system_change_ticket_status()
-        tools = system_db.get_all_tools()
-        return system_db.get_status()
+    def get_system_status(self, system_id: int) -> SystemStatus:
+        linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)
+        released_docs = linker.get_amount_of_documents_of_entity(system_id, is_released=True)
+        unreleased_docs = linker.get_amount_of_documents_of_entity(system_id, is_released=False)
+        return SystemStatus(released_docs, unreleased_docs, 0, 0, 0, 0)
