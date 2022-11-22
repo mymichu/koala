@@ -19,10 +19,7 @@ class System(BaseModel):
     purpose: str
 
 
-class SystemExtended(BaseModel):
-    name: str
-    version_major: int
-    purpose: str
+class SystemExtended(System):
     identity: int
 
 
