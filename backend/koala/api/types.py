@@ -35,6 +35,7 @@ class System(Entity):
     pass
 
 
+# pylint: disable=too-many-arguments
 @dataclass(eq=False)
 class Tool(Entity):
     def __init__(

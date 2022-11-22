@@ -1,14 +1,13 @@
 from typing import List
-from xml.dom.minidom import Identified
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
-from koala.api.types import Document
 from pydantic import BaseModel
 
 from koala.api.document import Document as DocumentApi
 from koala.api.system import System as SystemApiModel
 from koala.api.system import SystemApi
+from koala.api.types import Document
 from koala.factory import ContainerApi
 
 router = APIRouter()
@@ -42,11 +41,10 @@ def convert_system(system_api: SystemApiModel) -> SystemExtended:
 
 
 def convert_systems(systems_api: List[SystemApiModel]) -> List[SystemExtended]:
-    systems = map(
-        lambda system: convert_system(system),
-        systems_api,
-    )
-    return list(systems)
+    systems: List[SystemExtended] = []
+    for system in systems_api:
+        systems.append(convert_system(system))
+    return systems
 
 
 def convert_documents(documents_api: List[DocumentApi]) -> List[Document]:
