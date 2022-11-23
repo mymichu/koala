@@ -1,14 +1,15 @@
 # Database Structure
 
-The following shows the database structure of the backend. 
+The following shows the database structure of the backend.
 
 ```mermaid
 classDiagram
+    user <|-- entity_ownership
+    user <|-- change
     entity <|-- entitylinker
     entity <|-- change
-    entity <|-- entity_x_document
     entity <|-- entity_ownership
-    user <|-- entity_ownership
+    entity <|-- entity_x_document
     document <|-- entity_x_document
     class entity{
         +id (Autoincrement)
@@ -40,7 +41,8 @@ classDiagram
         +entity_major_version
         +requester_id
         +reviewer_id
-        +change
+        +description
+        +creation_date
     }
     class document{
         +id (Autoincrement)
@@ -77,4 +79,4 @@ The entitylinker table links a tool to a system or a tool to another tool. This 
 
 
 ### entitiy_ownership
-The entitiy ownership table contains all users that are responsible for an entity (defined ownership). A tool can have multiple owners. 
+The entitiy ownership table contains all users that are responsible for an entity (defined ownership). A tool can have multiple owners.
