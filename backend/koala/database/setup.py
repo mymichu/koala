@@ -54,11 +54,14 @@ class DatabaseInitializer:
         self._client.sqlExec(
             """
             CREATE TABLE IF NOT EXISTS change (
-                id INTEGER AUTO_INCREMENT,
-                change VARCHAR[256],
-                entity_name VARCHAR[256],
-                entity_major_version INTEGER,
-                PRIMARY KEY id
+                 requester_id INTEGER,
+                 reviewer_id INTEGER,
+                 creation_date TIMESTAMP,
+                 id INTEGER AUTO_INCREMENT,
+                 description VARCHAR[256],
+                 entity_name VARCHAR[256],
+                 entity_major_version INTEGER,
+                 PRIMARY KEY id
                 );"""
         )
 

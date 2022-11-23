@@ -1,12 +1,12 @@
-from urllib import response
 import pytest
 import requests
+
 
 url = "http://localhost:8002"
 
 
 @pytest.mark.order(1)
-def test_get_empty_systems():
+def test_get_empty_systems() -> None:
     response = requests.get(f"{url}/systems")
     assert response.status_code == 200
     response_body = response.json()
@@ -14,7 +14,7 @@ def test_get_empty_systems():
 
 
 @pytest.mark.order(2)
-def test_post_system_one_element():
+def test_post_system_one_element() -> None:
     system_to_add = {
         "name": "system 1",
         "version_major": 1,
@@ -28,7 +28,7 @@ def test_post_system_one_element():
 
 
 @pytest.mark.order(3)
-def test_get_all_system_one_element():
+def test_get_all_system_one_element() -> None:
     response = requests.get(f"{url}/systems")
     assert response.status_code == 200
     response_body = response.json()
