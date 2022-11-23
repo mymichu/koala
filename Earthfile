@@ -40,7 +40,7 @@ docker-app:
     COPY +build/dist dist
     RUN pip install dist/*.whl
     ENTRYPOINT python3 -m koala 
-    SAVE IMAGE ghcr.io/mymichu/koala:latest
+    SAVE IMAGE --push ghcr.io/mymichu/koala:latest
 
 sys-test:
     FROM earthly/dind:alpine
