@@ -222,6 +222,20 @@ tcolorpy = ">=0.0.5,<1"
 typepy = ">=1.1.1,<2"
 
 [[package]]
+name = "pytest-order"
+version = "1.0.1"
+description = "pytest plugin to run your tests in a specific order"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pytest = [
+    {version = ">=5.0", markers = "python_version < \"3.10\""},
+    {version = ">=6.2.4", markers = "python_version >= \"3.10\""},
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -348,7 +362,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "88d702365012f4fcd3f3ce61b2bde2fa02408f07608fa297b5561506bd5e3680"
+content-hash = "ab9526ab09866067ff28fce08a79f419b2bde2dc779c913799e3c28fa418df7d"
 
 [metadata.files]
 atomicwrites = [
@@ -421,6 +435,10 @@ pytest = [
 pytest-md-report = [
     {file = "pytest-md-report-0.3.0.tar.gz", hash = "sha256:adaf3c5971bafb11d28ce732ead7588efa4aa4d96fbba96afac65c90b69d0255"},
     {file = "pytest_md_report-0.3.0-py3-none-any.whl", hash = "sha256:6b1054c7c317c498d6a765ba9793ed5ebaccc782b5f40481c5d19dd8ac87951a"},
+]
+pytest-order = [
+    {file = "pytest-order-1.0.1.tar.gz", hash = "sha256:5dd6b929fbd7eaa6d0ee07586f65c623babb0afe72b4843c5f15055d6b3b1b1f"},
+    {file = "pytest_order-1.0.1-py3-none-any.whl", hash = "sha256:bbe6e63a8e23741ab3e810d458d1ea7317e797b70f9550512d77d6e9e8fd1bbb"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},

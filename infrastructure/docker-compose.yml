@@ -17,6 +17,7 @@ services:
       - back-tier
     environment:
       IMMUDB_HOST: "database"
+      HOST: "0.0.0.0"
 
 configs:
   httpd-config:
@@ -27,4 +28,5 @@ secrets:
     external: true
 
 networks:
-  back-tier: {}
+  back-tier:
+    driver: bridge

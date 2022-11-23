@@ -12,6 +12,7 @@ python = "^3.9"
 pytest = "7.1.2"
 requests = "^2.28.1"
 pytest-md-report = "^0.3.0"
+pytest-order = "^1.0.0"
 
 
 
