@@ -12,6 +12,7 @@ print(f"DATABASE: {host}")
 URL = f"{host}:3322"
 USERNAME = os.getenv("IMMUDB_USR", "immudb")
 PASSWORD = os.getenv("IMMUDB_PW", "immudb")
+HOST = os.getenv("HOST", "127.0.0.1")
 
 
 def create_application() -> FastAPI:
@@ -40,7 +41,7 @@ def create_application() -> FastAPI:
 
 def main() -> None:
     app = create_application()
-    uvicorn.run(app, port=8002)
+    uvicorn.run(app, host=HOST, port=8002)
 
 
 if __name__ == "__main__":

@@ -10,7 +10,6 @@ docker:
 
 install:
     FROM +docker
-    RUN poetry update
     RUN poetry install
 
 check:
@@ -50,6 +49,7 @@ sys-test:
         python3 \
         python3-dev \
         build-base
+    RUN ln -s /usr/bin/python3 /usr/bin/python
     RUN curl -sSL https://install.python-poetry.org | python3 - --preview
     ENV PATH="/root/.local/bin:$PATH"
     COPY system-test system-test
@@ -57,5 +57,5 @@ sys-test:
     WITH DOCKER --compose infrastructure/docker-compose.yml --load=+docker-app \
         --service database \
         --service koala
-        RUN sleep 5 && cd system-test && poetry install && poetry run pytest --md-report --md-report-verbose=1 system_api_test.py 
+        RUN sleep 5 && cd system-test && poetry install && poetry run pytest --md-report --md-report-verbose=1 system_api_test.py
     END

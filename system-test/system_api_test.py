@@ -5,7 +5,7 @@ import requests
 url = "http://localhost:8002"
 
 
-@pytest.mark.order1
+@pytest.mark.order(1)
 def test_get_empty_systems():
     response = requests.get(f"{url}/systems")
     assert response.status_code == 200
@@ -13,7 +13,7 @@ def test_get_empty_systems():
     assert response_body == []
 
 
-@pytest.mark.order2
+@pytest.mark.order(2)
 def test_post_system_one_element():
     tool_to_add = {
         "name": "clang",
@@ -27,7 +27,7 @@ def test_post_system_one_element():
     assert response_body["identity"] == 1
 
 
-@pytest.mark.order3
+@pytest.mark.order(3)
 def test_get_all_system_one_element():
     response = requests.get(f"{url}/systems")
     assert response.status_code == 200
