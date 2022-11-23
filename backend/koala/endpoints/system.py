@@ -4,11 +4,11 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from koala.api.document import Document as DocumentApi
+from koala.api.document import DocumentApi
 from koala.api.system import System as SystemApiModel
 from koala.api.system import SystemApi
 from koala.api.system import SystemStatus as SystemStatusApi
-from koala.api.types import Document
+from koala.api.types import Document as DocumentApiModel
 from koala.factory import ContainerApi
 
 router = APIRouter()
@@ -24,9 +24,15 @@ class SystemExtended(System):
     identity: int
 
 
-class Documents(BaseModel):
+class Document(BaseModel):
     name: str
     path: str
+
+
+class DocumentExtended(Document):
+    name: str
+    path: str
+    identity: int
 
 
 # pylint: disable=duplicate-code
@@ -52,12 +58,12 @@ def convert_systems(systems_api: List[SystemApiModel]) -> List[SystemExtended]:
     return [convert_system(system) for system in systems_api]
 
 
-def convert_documents(documents_api: List[DocumentApi]) -> List[Document]:
-    documents = map(
-        lambda system: Document(name=system.name, path=system.path),
-        documents_api,
-    )
-    return list(documents)
+def convert_document(document: DocumentApiModel) -> DocumentExtended:
+    return DocumentExtended(name=document.name, path=document.path, identity=document.identity)
+
+
+def convert_documents(documents_api: List[DocumentApiModel]) -> List[DocumentExtended]:
+    return [convert_document(document) for document in documents_api]
 
 
 @router.get("/systems/", tags=["systems"], response_model=List[SystemExtended])
@@ -94,10 +100,23 @@ async def get_system_status(
     )
 
 
-@router.get("/systems/{identity}/documents", tags=["systems"], response_model=List[Document])
+@router.get("/systems/{identity}/documents", tags=["systems"], response_model=List[DocumentExtended])
 @inject
 async def get_system_documents(
     identity: int, system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory])
-) -> List[Document]:
+) -> List[DocumentExtended]:
     documents_api_model = system_api.get_system_documents(identity)
     return convert_documents(documents_api_model)
+
+
+@router.post("/systems/{identity}/documents", tags=["systems"], response_model=DocumentExtended)
+@inject
+async def add_create_document_to_system(
+    identity: int,
+    document: Document,
+    system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory]),
+    document_api: DocumentApi = Depends(Provide[ContainerApi.api_document_factory]),
+) -> DocumentExtended:
+    document_database = document_api.add_document(DocumentApiModel(document.name, document.path))
+    system_api.add_system_document(identity, document_database)
+    return convert_document(document_database)

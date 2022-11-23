@@ -26,8 +26,8 @@ class Document(DocumentID):
         self._client.sqlExec(
             """
         BEGIN TRANSACTION;
-            INSERT INTO document (name, path, creation_date)
-            VALUES (@name, @path, NOW());
+            INSERT INTO document (name, path, is_released,creation_date)
+            VALUES (@name, @path, FALSE, NOW());
         COMMIT;
         """,
             params={

@@ -66,8 +66,8 @@ def test_get_all_documents_for_given_sde(koala_api):
     api_document.add_document(doc_b)
 
     esw1_database = api_system.add_system(esw1)
-    api_system.add_system_document(esw1, doc_a)
-    api_system.add_system_document(esw1, doc_b)
+    api_system.add_system_document(esw1_database.identity, doc_a)
+    api_system.add_system_document(esw1_database.identity, doc_b)
 
     result = api_system.get_system_documents(esw1_database.identity)
     assert set(result) == set(
@@ -95,8 +95,8 @@ def test_get_status_for_given_sde_released_documents(koala_api):
     esw1_db = api_system.add_system(esw1)
     doc_a_db = api_document.add_document(doc_a)
     doc_b_db = api_document.add_document(doc_b)
-    api_system.add_system_document(esw1_db, doc_a)
-    api_system.add_system_document(esw1_db, doc_b)
+    api_system.add_system_document(esw1_db.identity, doc_a)
+    api_system.add_system_document(esw1_db.identity, doc_b)
     api_document.update_release_status(doc_a_db.identity, True)
     api_document.update_release_status(doc_b_db.identity, True)
     api_document.update_release_status(doc_a_db.identity, False)
@@ -104,6 +104,34 @@ def test_get_status_for_given_sde_released_documents(koala_api):
     result = api_system.get_system_status(esw1_db.identity)
 
     assert SystemStatus(1, 1, 0, 0, 0, 0) == result
+
+
+def test_get_status_for_given_sde_released_documents_brand_new(koala_api):
+    api_system: SystemApi = koala_api.api_system_factory()
+    api_document: DocumentApi = koala_api.api_document_factory()
+    esw1 = System(name="esw1", version_major=13, purpose="esw1")
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    esw1_db = api_system.add_system(esw1)
+    api_document.add_document(doc_a)
+    api_document.add_document(doc_b)
+    api_system.add_system_document(esw1_db.identity, doc_a)
+    api_system.add_system_document(esw1_db.identity, doc_b)
+
+    result = api_system.get_system_status(esw1_db.identity)
+
+    assert (
+        SystemStatus(
+            released_documents=0,
+            unreleased_documents=2,
+            released_tools=0,
+            unreleased_tools=0,
+            closed_change_requests=0,
+            open_change_requests=0,
+        )
+        == result
+    )
 
 
 @pytest.mark.skip(reason="Not Implemented")

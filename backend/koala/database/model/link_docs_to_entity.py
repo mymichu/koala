@@ -19,6 +19,16 @@ class LinkDocEntity(LinkDocEntityID):
         self._client = client
 
     def add(self) -> None:
+        resp = self._client.sqlQuery(
+            """
+            SELECT id FROM entity WHERE id=@entity_id;
+            """,
+            params={"entity_id": self.entity_id},
+        )
+        print(self.entity_id)
+        if len(resp) != 1 or resp[0][0] != self.entity_id:
+            raise Exception("Entity does not exist")
+
         self._client.sqlExec(
             """
         BEGIN TRANSACTION;
