@@ -16,7 +16,9 @@ class ContainerDatabase(containers.DeclarativeContainer):
 
 
 class ContainerApi(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(modules=[".endpoints.tools", ".endpoints.system"])
+    wiring_config = containers.WiringConfiguration(
+        modules=[".endpoints.tools", ".endpoints.system", ".endpoints.document"]
+    )
 
     config = providers.Configuration(strict=True)
     immuclient = providers.Dependency(instance_of=ImmudbClient)

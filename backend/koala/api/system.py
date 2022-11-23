@@ -50,14 +50,13 @@ class SystemApi:
         system_database.add()
         return System(system.name, system.version_major, system.purpose, identity=system_database.get_id())
 
-    def add_system_document(self, system: System, document: Document) -> None:
+    def add_system_document(self, system_id: int, document: Document) -> None:
         document_id = DocumentDB.Document(self._client, document.name, document.path).get_id()
-        system_db_id = SystemDB.System(self._client, system.name, system.version_major, system.purpose).get_id()
 
         link = DatabaseLinkDocEntity(
             self._client,
             document_id,
-            system_db_id,
+            system_id,
         )
         link.add()
 
