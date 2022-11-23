@@ -42,10 +42,10 @@ jobs:
       run: earthly --ci --remote-cache=${{ env.REMOTE_BUILD_CACHE }} --push +install
 
     - name: Run check Code Qality
-      run: earthly --ci --remote-cache=${{ env.REMOTE_BUILD_CACHE }} --push +check
+      run: earthly --ci --remote-cache=${{ env.REMOTE_BUILD_CACHE }} +check
 
     - name: Run build
-      run: earthly --ci --remote-cache=${{ env.REMOTE_BUILD_CACHE }} --push +build
+      run: earthly --ci --remote-cache=${{ env.REMOTE_BUILD_CACHE }} +build
 
     - name: Run integration test
       run: earthly --ci -P --remote-cache=${{ env.REMOTE_INTEGRATION_TEST_CACHE }} --push +test
