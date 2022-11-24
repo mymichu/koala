@@ -9,30 +9,10 @@ from koala.api.system import System as SystemApiModel
 from koala.api.system import SystemApi
 from koala.api.system import SystemStatus as SystemStatusApi
 from koala.api.types import Document as DocumentApiModel
+from koala.endpoints.types import Document, DocumentExtended, System, SystemExtended
 from koala.factory import ContainerApi
 
 router = APIRouter()
-
-
-class System(BaseModel):
-    name: str
-    version_major: int
-    purpose: str
-
-
-class SystemExtended(System):
-    identity: int
-
-
-class Document(BaseModel):
-    name: str
-    path: str
-
-
-class DocumentExtended(Document):
-    name: str
-    path: str
-    identity: int
 
 
 # pylint: disable=duplicate-code

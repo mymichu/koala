@@ -57,5 +57,5 @@ sys-test:
     WITH DOCKER --compose infrastructure/docker-compose.yml --load=+docker-app \
         --service database \
         --service koala
-        RUN sleep 5 && cd system-test && poetry install && poetry run pytest --md-report --md-report-verbose=1 system_api_test.py
+        RUN sleep 5 && cd system-test && poetry install && poetry run pytest --md-report --md-report-verbose=1 happy_path.py
     END
