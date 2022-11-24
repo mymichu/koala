@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import List
 
 from immudb import ImmudbClient
 
@@ -7,8 +8,7 @@ from immudb import ImmudbClient
 @dataclass
 class ChangeID:
     identity: int
-    entity_name: str
-    entity_major_version: int
+    entity_id: int
     requester_id: int
     reviewer_id: int
     description: str
@@ -20,27 +20,28 @@ class Change(ChangeID):
         self,
         client: ImmudbClient,
         identity: int = -1,
-        entity_name: str = "",
-        entity_major_version: str = "",
+        entity_id: int = -1,
         requester_id: int = -1,
         reviewer_id: int = -1,
         description: str = "",
     ) -> None:
-        super().__init__(identity, entity_name, entity_major_version, requester_id, reviewer_id, description)
+        super().__init__(identity, entity_id, requester_id, reviewer_id, description)
         self._client = client
+
+    def _convert_query_change_id(self, resp: tuple) -> List[ChangeID]:
+        return [ChangeID(*item) for item in resp]
 
     def add(self) -> None:
         self._check_id()
         self._client.sqlExec(
             """
             BEGIN TRANSACTION;
-                INSERT INTO document (entity_name, entity_major_version, creation_date, requester_id, reviewer_id, description)
-                VALUES (@name, @version, NOW(), @q_id, @r_id, @desc);
+                INSERT INTO change(entity_id, creation_date, requester_id, reviewer_id, description)
+                VALUES (@e_id, NOW(), @q_id, @r_id, @desc);
             COMMIT;
             """,
             params={
-                "name": self.entity_name,
-                "version": self.entity_major_version,
+                "e_id": self.entity_id,
                 "q_id": self.requester_id,
                 "r_id": self.reviewer_id,
                 "desc": self.description,
@@ -50,11 +51,10 @@ class Change(ChangeID):
     def get_id(self) -> int:
         resp = self._client.sqlQuery(
             """
-            SELECT id FROM document
-            WHERE entity_name=@name
-            AND entity_major_version=@version
+            SELECT id FROM change
+            WHERE entity_id=@e_id
             """,
-            params={"name": self.entity_name, "version": self.entity_major_version},
+            params={"e_id": self.entity_id},
         )
 
         if len(resp) != 1:
@@ -67,5 +67,10 @@ class Change(ChangeID):
         if self.requester_id == -1:
             raise ValueError("Requestor ID not set")
 
-        if self.reviewer_id == -1:
-            raise ValueError("Reviewer ID not set")
+    def get_all_changes(self) -> List[ChangeID]:
+        resp = self._client.sqlQuery(
+            """
+            SELECT id, entity_id, requester_id, reviewer_id, description, creation_date FROM change;
+            """
+        )
+        return self._convert_query_change_id(resp)

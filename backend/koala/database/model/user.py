@@ -9,6 +9,7 @@ class UserData:
     first_name: str
     email: str
     active: bool = True
+    identity: int = -1
 
 
 class User:
@@ -44,3 +45,16 @@ class User:
                 "email": self._user.email,
             },
         )
+
+    def get_id(self) -> int:
+        resp = self._client.sqlQuery(
+            """
+            SELECT id FROM user
+            WHERE email=@email
+            """,
+            params={"email": self._user.email},
+        )
+        if len(resp) != 1:
+            raise Exception("Document not found")
+        self._user.identity = int(resp[0][0])
+        return self._user.identity

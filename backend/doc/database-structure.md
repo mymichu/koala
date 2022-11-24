@@ -37,8 +37,7 @@ classDiagram
     }
     class change{
         +id (Autoincrement)
-        +entity_name
-        +entity_major_version
+        +entity_id
         +requester_id
         +reviewer_id
         +description
