@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List
 
 from immudb import ImmudbClient
@@ -9,6 +10,15 @@ from koala.database.model import link_system_to_tool as LinkerSystemToolDB
 from koala.database.model import tool as ToolDB
 
 from .types import Document, System, Tool
+
+
+@dataclass
+class ToolStatus:
+    is_productive: bool
+    amount_documents_released: int
+    amount_documents_unreleased: int
+    amount_change_requests_closed: int
+    amount_change_requests_open: int
 
 
 class ToolApi:
@@ -47,7 +57,13 @@ class ToolApi:
         return self._convert(tool_database)
 
     def add_tool(self, tool: Tool) -> Tool:
-        tool_database = ToolDB.Tool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
+        tool_database = ToolDB.Tool(
+            client=self._client,
+            name=tool.name,
+            version_major=tool.version_major,
+            purpose=tool.purpose,
+            gmp_relevant=tool.gmp_relevant,
+        )
         tool_database.add()
         tool.identity = tool_database.get_id()
         return tool
@@ -74,11 +90,9 @@ class ToolApi:
         docs_db = doc_linker.get_linked_to_tools(tool_id)
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
 
-    def add_tool_document(self, tool: Tool, document: Document) -> None:
+    def add_tool_document(self, tool_id: int, document: Document) -> None:
         doc_db = DocumentDB.Document(self._client, document.name, document.path)
         document_id = doc_db.get_id()
-        tool_db = ToolDB.Tool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
-        tool_id = tool_db.get_id()
 
         link = LinkerDocEntityDB.LinkDocEntity(
             self._client,
@@ -99,3 +113,28 @@ class ToolApi:
             )
             for system_db in systems_database
         ]
+
+    def get_tool_status(self, tool_id: int) -> ToolStatus:
+        tool = ToolDB.Tool(self._client, identity=tool_id)
+        linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)
+        is_productive = tool.is_active()
+        released_docs = linker.get_amount_of_documents_of_entity(tool_id, is_released=True)
+        unreleased_docs = linker.get_amount_of_documents_of_entity(tool_id, is_released=False)
+        closed_change_requests = 0  # TODO: add change request api
+        open_change_requests = 0  # TODO: add change request api
+
+        return ToolStatus(
+            is_productive=is_productive,
+            amount_documents_released=released_docs,
+            amount_documents_unreleased=unreleased_docs,
+            amount_change_requests_closed=closed_change_requests,
+            amount_change_requests_open=open_change_requests,
+        )
+
+    def set_tool_productive(self, tool_id: int) -> None:
+        tool = ToolDB.Tool(self._client, identity=tool_id)
+        tool.set_active(True)
+
+    def set_tool_unproductive(self, tool_id: int) -> None:
+        tool = ToolDB.Tool(self._client, identity=tool_id)
+        tool.set_active(False)

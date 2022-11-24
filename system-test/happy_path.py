@@ -77,12 +77,15 @@ def test_get_system_status_1_1_document_not_released():
     print(response_body)
     print(type(response_body))
     assert response_body == {
-        "released_documents": 0,
-        "unreleased_documents": 1,
-        "released_tools": 0,
-        "unreleased_tools": 0,
-        "closed_change_requests": 0,
-        "open_change_requests": 0,
+        "is_productive": False,
+        "amount_documents_released": 0,
+        "amount_documents_unreleased": 1,
+        "amount_tools_productive": 0,
+        "amount_tools_not_productive": 0,
+        "amount_systems_productive": 0,
+        "amount_systems_not_productive": 0,
+        "amount_change_request_closed": 0,
+        "amount_change_request_open": 0,
     }
 
 
@@ -100,12 +103,15 @@ def test_get_system_status_1_1_document_released():
     print(response_body)
     print(type(response_body))
     assert response_body == {
-        "released_documents": 1,
-        "unreleased_documents": 0,
-        "released_tools": 0,
-        "unreleased_tools": 0,
-        "closed_change_requests": 0,
-        "open_change_requests": 0,
+        "is_productive": False,
+        "amount_documents_released": 1,
+        "amount_documents_unreleased": 0,
+        "amount_tools_productive": 0,
+        "amount_tools_not_productive": 0,
+        "amount_systems_productive": 0,
+        "amount_systems_not_productive": 0,
+        "amount_change_request_closed": 0,
+        "amount_change_request_open": 0,
     }
 
 

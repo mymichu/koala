@@ -37,7 +37,7 @@ def test_link_existing_sde_to_existing_tool(koala_api):
     api_tool: ToolApi = koala_api.api_tool_factory()
     api_system: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    esw1_db = api_system.add_system(esw1)
+    esw1_registered = api_system.add_system(esw1)
 
     project_x = System(name="project x", version_major=1, purpose="building firmware for project X")
     project_x_db = api_system.add_system(project_x)
@@ -48,7 +48,7 @@ def test_link_existing_sde_to_existing_tool(koala_api):
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
     gcc_db = api_tool.add_tool(gcc)
 
-    api_tool.link_tools_to_system(tools_id=[gcc_db.identity], system_id=esw1_db.identity)
+    api_tool.link_tools_to_system(tools_id=[gcc_db.identity], system_id=esw1_registered.identity)
     api_tool.link_tools_to_system(tools_id=[gcc_db.identity], system_id=project_x_db.identity)
 
     systems = api_tool.get_systems_for_tool(gcc_db.identity)
@@ -85,25 +85,72 @@ def test_submit_change_for_given_user_and_given_sde():
     pass
 
 
-def test_get_status_for_given_sde_released_documents(koala_api):
+def test_get_status_for_given_released_sde(koala_api):
     api_system: SystemApi = koala_api.api_system_factory()
     api_document: DocumentApi = koala_api.api_document_factory()
     esw1 = System(name="esw1", version_major=13, purpose="esw1")
     doc_a = Document(name="intro", path="path/to/intro")
     doc_b = Document(name="class", path="path/to/class")
 
-    esw1_db = api_system.add_system(esw1)
-    doc_a_db = api_document.add_document(doc_a)
-    doc_b_db = api_document.add_document(doc_b)
-    api_system.add_system_document(esw1_db.identity, doc_a)
-    api_system.add_system_document(esw1_db.identity, doc_b)
-    api_document.update_release_status(doc_a_db.identity, True)
-    api_document.update_release_status(doc_b_db.identity, True)
-    api_document.update_release_status(doc_a_db.identity, False)
+    esw1_registered = api_system.add_system(esw1)
+    doc_a_registered = api_document.add_document(doc_a)
+    doc_b_registered = api_document.add_document(doc_b)
+    api_system.add_system_document(esw1_registered.identity, doc_a)
+    api_system.add_system_document(esw1_registered.identity, doc_b)
+    # Release documents
+    api_document.update_release_status(doc_a_registered.identity, True)
+    api_document.update_release_status(doc_b_registered.identity, True)
+    # Release SDE
+    api_system.set_system_productive(esw1_registered.identity)
+    result = api_system.get_system_status(esw1_registered.identity)
+    assert (
+        SystemStatus(
+            is_productive=True,
+            amount_documents_released=2,
+            amount_documents_unreleased=0,
+            amount_tools_productive=0,
+            amount_tools_not_productive=0,
+            amount_systems_productive=0,
+            amount_systems_not_productive=0,
+            amount_change_request_closed=0,
+            amount_change_request_open=0,
+        )
+        == result
+    )
 
-    result = api_system.get_system_status(esw1_db.identity)
 
-    assert SystemStatus(1, 1, 0, 0, 0, 0) == result
+def test_get_status_for_given_deprecatesde(koala_api):
+    api_system: SystemApi = koala_api.api_system_factory()
+    api_document: DocumentApi = koala_api.api_document_factory()
+    esw1 = System(name="esw1", version_major=13, purpose="esw1")
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    esw1_registered = api_system.add_system(esw1)
+    doc_a_registered = api_document.add_document(doc_a)
+    doc_b_registered = api_document.add_document(doc_b)
+    api_system.add_system_document(esw1_registered.identity, doc_a)
+    api_system.add_system_document(esw1_registered.identity, doc_b)
+    # Release documents
+    api_document.update_release_status(doc_a_registered.identity, True)
+    api_document.update_release_status(doc_b_registered.identity, True)
+    # Deprecate SDE
+    api_system.set_system_unproductive(esw1_registered.identity)
+    result = api_system.get_system_status(esw1_registered.identity)
+    assert (
+        SystemStatus(
+            is_productive=False,
+            amount_documents_released=2,
+            amount_documents_unreleased=0,
+            amount_tools_productive=0,
+            amount_tools_not_productive=0,
+            amount_systems_productive=0,
+            amount_systems_not_productive=0,
+            amount_change_request_closed=0,
+            amount_change_request_open=0,
+        )
+        == result
+    )
 
 
 def test_get_status_for_given_sde_released_documents_brand_new(koala_api):
@@ -113,22 +160,25 @@ def test_get_status_for_given_sde_released_documents_brand_new(koala_api):
     doc_a = Document(name="intro", path="path/to/intro")
     doc_b = Document(name="class", path="path/to/class")
 
-    esw1_db = api_system.add_system(esw1)
+    esw1_registered = api_system.add_system(esw1)
     api_document.add_document(doc_a)
     api_document.add_document(doc_b)
-    api_system.add_system_document(esw1_db.identity, doc_a)
-    api_system.add_system_document(esw1_db.identity, doc_b)
+    api_system.add_system_document(esw1_registered.identity, doc_a)
+    api_system.add_system_document(esw1_registered.identity, doc_b)
 
-    result = api_system.get_system_status(esw1_db.identity)
+    result = api_system.get_system_status(esw1_registered.identity)
 
     assert (
         SystemStatus(
-            released_documents=0,
-            unreleased_documents=2,
-            released_tools=0,
-            unreleased_tools=0,
-            closed_change_requests=0,
-            open_change_requests=0,
+            is_productive=False,
+            amount_documents_released=0,
+            amount_documents_unreleased=2,
+            amount_tools_productive=0,
+            amount_tools_not_productive=0,
+            amount_systems_productive=0,
+            amount_systems_not_productive=0,
+            amount_change_request_closed=0,
+            amount_change_request_open=0,
         )
         == result
     )

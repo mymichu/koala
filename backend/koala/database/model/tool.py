@@ -14,9 +14,17 @@ class ToolID(Entity):
 # pylint: disable=too-many-arguments
 class Tool(ToolID):
     def __init__(
-        self, client: ImmudbClient, name: str, version_major: int, purpose: str, gmp_relevant: bool = True
+        self,
+        client: ImmudbClient,
+        name: str = "",
+        version_major: int = -1,
+        purpose: str = "",
+        identity: int = -1,
+        gmp_relevant: bool = True,
     ) -> None:
-        super().__init__(name=name, version_major=version_major, purpose=purpose, gmp_relevant=gmp_relevant)
+        super().__init__(
+            name=name, version_major=version_major, purpose=purpose, identity=identity, gmp_relevant=gmp_relevant
+        )
         self._client = client
         self._entity = DataBaseEntity(
             client=client,
@@ -25,6 +33,7 @@ class Tool(ToolID):
                 version_major=version_major,
                 purpose=purpose,
                 gmp_relevant=gmp_relevant,
+                identity=identity,
             ),
         )
 
@@ -33,6 +42,12 @@ class Tool(ToolID):
 
     def get_id(self) -> int:
         return self._entity.get_id()
+
+    def is_active(self) -> bool:
+        return self._entity.is_active()
+
+    def set_active(self, active: bool) -> None:
+        return self._entity.set_active_status(active)
 
 
 class ToolMonitor:

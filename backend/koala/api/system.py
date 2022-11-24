@@ -15,13 +15,17 @@ from .types import Document, System, Tool
 
 
 @dataclass
+# pylint: disable=too-many-instance-attributes
 class SystemStatus:
-    released_documents: int
-    unreleased_documents: int
-    released_tools: int
-    unreleased_tools: int
-    closed_change_requests: int
-    open_change_requests: int
+    is_productive: bool
+    amount_documents_released: int
+    amount_documents_unreleased: int
+    amount_tools_productive: int
+    amount_tools_not_productive: int
+    amount_systems_productive: int
+    amount_systems_not_productive: int
+    amount_change_request_closed: int
+    amount_change_request_open: int
 
 
 class SystemApi:
@@ -72,7 +76,28 @@ class SystemApi:
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
 
     def get_system_status(self, system_id: int) -> SystemStatus:
+        system = SystemDB.System(self._client, identity=system_id)
         linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)
+        is_productive = system.is_active()
         released_docs = linker.get_amount_of_documents_of_entity(system_id, is_released=True)
         unreleased_docs = linker.get_amount_of_documents_of_entity(system_id, is_released=False)
-        return SystemStatus(released_docs, unreleased_docs, 0, 0, 0, 0)
+        # TODO: add change requests status
+        return SystemStatus(
+            is_productive=is_productive,
+            amount_documents_released=released_docs,
+            amount_documents_unreleased=unreleased_docs,
+            amount_tools_productive=0,
+            amount_tools_not_productive=0,
+            amount_systems_productive=0,
+            amount_systems_not_productive=0,
+            amount_change_request_closed=0,
+            amount_change_request_open=0,
+        )
+
+    def set_system_productive(self, system_id: int) -> None:
+        system = SystemDB.System(self._client, identity=system_id)
+        system.set_active(True)
+
+    def set_system_unproductive(self, system_id: int) -> None:
+        system = SystemDB.System(self._client, identity=system_id)
+        system.set_active(False)
