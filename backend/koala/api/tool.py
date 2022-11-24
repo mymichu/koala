@@ -38,9 +38,6 @@ class ToolApi:
         tool_database = monitor_database.get_non_gmp_relevant_tools()
         return self._convert(tool_database)
 
-    def get_all_gmp_relevant_tools(self) -> List[Tool]:
-        pass
-
     def unlinked_tools(self) -> List[Tool]:
         monitor_database = ToolDB.ToolMonitor(self._client)
         tool_database = monitor_database.unlinked_tools()

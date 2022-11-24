@@ -54,13 +54,12 @@ class DatabaseInitializer:
         self._client.sqlExec(
             """
             CREATE TABLE IF NOT EXISTS change (
+                 id INTEGER AUTO_INCREMENT,
+                 entity_id INTEGER,
                  requester_id INTEGER,
                  reviewer_id INTEGER,
                  creation_date TIMESTAMP,
-                 id INTEGER AUTO_INCREMENT,
                  description VARCHAR[256],
-                 entity_name VARCHAR[256],
-                 entity_major_version INTEGER,
                  PRIMARY KEY id
                 );"""
         )
@@ -91,13 +90,20 @@ class DatabaseInitializer:
         self._client.sqlExec(
             """
             CREATE TABLE IF NOT EXISTS user (
+                id INTEGER AUTO_INCREMENT,
                 name VARCHAR[256],
                 first_name VARCHAR[256],
                 email VARCHAR[256],
                 active BOOLEAN,
                 created_at TIMESTAMP,
-                PRIMARY KEY email
+                PRIMARY KEY id
                 );"""
+        )
+
+        self._client.sqlExec(
+            """
+            CREATE UNIQUE INDEX ON user(email);
+            """
         )
 
         self._client.sqlExec(

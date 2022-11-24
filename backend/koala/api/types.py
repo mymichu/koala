@@ -57,9 +57,17 @@ class Tool(Entity):
 
 @dataclass
 class Change:
-    entity_name: str
-    entity_major_version: int
+    entity_id: int
     requester_id: int
     reviewer_id: int
     description: str
+    identity: int = -1
+
+
+@dataclass
+class User:
+    name: str
+    first_name: str
+    email: str
+    active: bool = True
     identity: int = -1
