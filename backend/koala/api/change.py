@@ -1,7 +1,9 @@
 from typing import List
+
 from immudb import ImmudbClient
 
 from koala.database.model import change as ChangeDB
+
 from .types import Change
 
 
