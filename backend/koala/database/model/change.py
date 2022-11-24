@@ -14,8 +14,18 @@ class ChangeID:
     description: str
     creation_date: datetime = datetime.now()
 
+
 class Change(ChangeID):
-    def __init__(self, client: ImmudbClient, identity: int = -1, entity_name: str = '', entity_major_version: str = '', requester_id: int = -1, reviewer_id: int = -1, description: str = '') -> None:
+    def __init__(
+        self,
+        client: ImmudbClient,
+        identity: int = -1,
+        entity_name: str = "",
+        entity_major_version: str = "",
+        requester_id: int = -1,
+        reviewer_id: int = -1,
+        description: str = "",
+    ) -> None:
         super().__init__(identity, entity_name, entity_major_version, requester_id, reviewer_id, description)
         self._client = client
 
@@ -29,14 +39,29 @@ class Change(ChangeID):
             COMMIT;
             """,
             params={
-                'name': self.entity_name,
-                'version': self.entity_major_version,
-                'q_id': self.requester_id,
-                'r_id': self.reviewer_id,
-                'desc': self.description,
-            }
+                "name": self.entity_name,
+                "version": self.entity_major_version,
+                "q_id": self.requester_id,
+                "r_id": self.reviewer_id,
+                "desc": self.description,
+            },
         )
 
+    def get_id(self) -> int:
+        resp = self._client.sqlQuery(
+            """
+            SELECT id FROM document
+            WHERE entity_name=@name
+            AND entity_major_version=@version
+            """,
+            params={"name": self.entity_name, "version": self.entity_major_version},
+        )
+
+        if len(resp) != 1:
+            raise Exception("Document not found")
+
+        self.identity = int(resp[0][0])
+        return self.identity
 
     def _check_id(self) -> None:
         if self.requester_id == -1:
@@ -44,4 +69,3 @@ class Change(ChangeID):
 
         if self.reviewer_id == -1:
             raise ValueError("Reviewer ID not set")
-
