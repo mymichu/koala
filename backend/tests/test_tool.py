@@ -2,7 +2,7 @@ import pytest
 
 from koala.api.document import DocumentApi
 from koala.api.system import SystemApi
-from koala.api.tool import ToolApi
+from koala.api.tool import ToolApi, ToolStatus
 from koala.api.types import Document, System, Tool
 from koala.api.user import UserApi, UserData
 
@@ -214,9 +214,9 @@ def test_get_all_documents_for_given_tool(koala_api):
     api_document.add_document(doc_a)
     api_document.add_document(doc_b)
 
-    api_tool.add_tool(clang)
-    api_tool.add_tool_document(clang, doc_a)
-    api_tool.add_tool_document(clang, doc_b)
+    clang_registered = api_tool.add_tool(clang)
+    api_tool.add_tool_document(clang_registered.identity, doc_a)
+    api_tool.add_tool_document(clang_registered.identity, doc_b)
 
     result = api_tool.get_tool_documents(clang)
     assert set(result) == set(
@@ -224,9 +224,61 @@ def test_get_all_documents_for_given_tool(koala_api):
     )
 
 
-@pytest.mark.skip(reason="Not Implemented")
-def test_get_status_for_given_tool():
-    pass
+def test_get_status_for_given_tool(koala_api):
+    api_tool: ToolApi = koala_api.api_tool_factory()
+    api_document: DocumentApi = koala_api.api_document_factory()
+    clang = Tool(name="clang", version_major=10, purpose="compiler")
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    clang_registered = api_tool.add_tool(clang)
+    api_document.add_document(doc_a)
+    api_document.add_document(doc_b)
+    api_tool.add_tool_document(clang_registered.identity, doc_a)
+    api_tool.add_tool_document(clang_registered.identity, doc_b)
+
+    result = api_tool.get_tool_status(clang_registered.identity)
+
+    assert (
+        ToolStatus(
+            is_productive=False,
+            amount_documents_released=0,
+            amount_documents_unreleased=2,
+            amount_change_requests_closed=0,
+            amount_change_requests_open=0,
+        )
+        == result
+    )
+
+
+def test_get_status_for_given_tool_productive(koala_api):
+    api_tool: ToolApi = koala_api.api_tool_factory()
+    api_document: DocumentApi = koala_api.api_document_factory()
+    clang = Tool(name="clang", version_major=10, purpose="compiler")
+    doc_a = Document(name="intro", path="path/to/intro")
+    doc_b = Document(name="class", path="path/to/class")
+
+    clang_registered = api_tool.add_tool(clang)
+    doc_a_registered = api_document.add_document(doc_a)
+    doc_b_registered = api_document.add_document(doc_b)
+    api_tool.add_tool_document(clang_registered.identity, doc_a)
+    api_tool.add_tool_document(clang_registered.identity, doc_b)
+
+    api_document.update_release_status(doc_a_registered.identity, True)
+    api_document.update_release_status(doc_b_registered.identity, True)
+    api_tool.set_tool_productive(clang_registered.identity)
+    result = api_tool.get_tool_status(clang_registered.identity)
+
+    assert (
+        ToolStatus(
+            is_productive=True,
+            amount_documents_released=2,
+            amount_documents_unreleased=0,
+            amount_change_requests_closed=0,
+            amount_change_requests_open=0,
+        )
+        == result
+    )
 
 
 @pytest.mark.skip(reason="Not Implemented")

@@ -24,12 +24,15 @@ router = APIRouter()
 
 # pylint: disable=duplicate-code
 class SystemStatus(BaseModel):
-    released_documents: int
-    unreleased_documents: int
-    released_tools: int
-    unreleased_tools: int
-    closed_change_requests: int
-    open_change_requests: int
+    is_productive: bool
+    amount_documents_released: int
+    amount_documents_unreleased: int
+    amount_tools_productive: int
+    amount_tools_not_productive: int
+    amount_systems_productive: int
+    amount_systems_not_productive: int
+    amount_change_request_closed: int
+    amount_change_request_open: int
 
 
 @router.get("/systems/", tags=["systems"], response_model=List[SystemExtended])
@@ -57,12 +60,15 @@ async def get_system_status(
 ) -> SystemStatus:
     system_api_model: SystemStatusApi = system_api.get_system_status(identity)
     return SystemStatus(
-        released_documents=system_api_model.released_documents,
-        unreleased_documents=system_api_model.unreleased_documents,
-        released_tools=system_api_model.released_tools,
-        unreleased_tools=system_api_model.unreleased_tools,
-        closed_change_requests=system_api_model.closed_change_requests,
-        open_change_requests=system_api_model.open_change_requests,
+        is_productive=system_api_model.is_productive,
+        amount_documents_released=system_api_model.amount_documents_released,
+        amount_documents_unreleased=system_api_model.amount_documents_unreleased,
+        amount_tools_productive=system_api_model.amount_tools_productive,
+        amount_tools_not_productive=system_api_model.amount_tools_not_productive,
+        amount_systems_productive=system_api_model.amount_systems_productive,
+        amount_systems_not_productive=system_api_model.amount_systems_not_productive,
+        amount_change_request_closed=system_api_model.amount_change_request_closed,
+        amount_change_request_open=system_api_model.amount_change_request_open,
     )
 
 
