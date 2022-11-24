@@ -1,5 +1,24 @@
 # Koala
 
+## How to run Koala
+
+Prerequisite: wget and Docker-Compose needs to be installed
+
+1. Download the Docker-Compose file and start the docker-compose:
+    ```bash 
+    wget https://raw.githubusercontent.com/mymichu/koala/main/infrastructure/docker-compose.yml \
+    && docker-compose up 
+    ```
+
+2. Now koala should be reachable. Open the Browser and connect to the [Koala-Swagger-API ](http://localhost:8002/docs)
+
+
+NOTE: There could be issues when running the command above. Sometimes the port is already used by another docker instance. To stop and clean all docker instances and images, run the following command:
+```bash
+docker kill $(docker ps -q) && docker system prune -af
+```
+
+
 ## Use Cases
 
 1. Give me all the tools of a system at a given time.
