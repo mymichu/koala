@@ -53,3 +53,13 @@ class Tool(Entity):
     ) -> None:
         super().__init__(name=name, version_major=version_major, purpose=purpose, identity=identity)
         self.gmp_relevant = gmp_relevant
+
+
+@dataclass
+class Change:
+    entity_name: str
+    entity_major_version: int
+    requester_id: int
+    reviewer_id: int
+    description: str
+    identity: int = -1
