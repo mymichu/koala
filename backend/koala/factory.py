@@ -1,12 +1,13 @@
 from http import client
+
 from dependency_injector import containers, providers
 from immudb import ImmudbClient
 
+from koala.api.change import ChangeApi
 from koala.api.document import DocumentApi
 from koala.api.system import SystemApi
 from koala.api.tool import ToolApi
 from koala.api.user import UserApi
-from koala.api.change import ChangeApi
 from koala.database.setup import DatabaseInitializer
 
 
