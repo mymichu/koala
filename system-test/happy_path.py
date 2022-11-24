@@ -15,13 +15,13 @@ def test_get_empty_systems():
 
 @pytest.mark.order(2)
 def test_post_system_one_element():
-    tool_to_add = {
+    system_to_add = {
         "name": "system 1",
         "version_major": 1,
         "purpose": "toolchain for embedded systems",
     }
 
-    response = requests.post(f"{url}/systems", json=tool_to_add)
+    response = requests.post(f"{url}/systems", json=system_to_add)
     assert response.status_code == 200
     response_body = response.json()
     assert response_body["identity"] == 1
@@ -88,8 +88,6 @@ def test_get_system_status_1_1_document_not_released():
 
 @pytest.mark.order(7)
 def test_put_document_1_to_release():
-    document_state = "state=relased"
-
     response = requests.put(
         f"{url}/documents/1/state?state=relased", data={"state": "relased"}
     )
@@ -111,3 +109,64 @@ def test_get_system_status_1_1_document_released():
         "closed_change_requests": 0,
         "open_change_requests": 0,
     }
+
+
+@pytest.mark.order(9)
+def test_get_empty_tools():
+    response = requests.get(f"{url}/tools")
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body == []
+
+
+@pytest.mark.order(10)
+def test_post_tool_one_element():
+    tool_to_add = {
+        "name": "clang",
+        "purpose": "compiler for x84/64 processors",
+        "version_major": 10,
+        "gmp_relevant": True,
+    }
+
+    response = requests.post(f"{url}/tools", json=tool_to_add)
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body["identity"] == 2
+
+
+@pytest.mark.order(11)
+def test_post_tool_second_element():
+    tool_to_add = {
+        "name": "arm-gcc",
+        "purpose": "compiler for arm processors",
+        "version_major": 9,
+        "gmp_relevant": True,
+    }
+
+    response = requests.post(f"{url}/tools", json=tool_to_add)
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body["identity"] == 3
+
+
+@pytest.mark.order(13)
+def test_get_empty_tools():
+    response = requests.get(f"{url}/tools")
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body == [
+        {
+            "name": "clang",
+            "purpose": "compiler for x84/64 processors",
+            "version_major": 10,
+            "gmp_relevant": True,
+            "identity": 2,
+        },
+        {
+            "name": "arm-gcc",
+            "purpose": "compiler for arm processors",
+            "version_major": 9,
+            "gmp_relevant": True,
+            "identity": 3,
+        },
+    ]
