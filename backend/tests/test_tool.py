@@ -101,9 +101,10 @@ def test_get_tools_with_given_name_when_one_tool_1_versions_and_2_purposes(koala
 
 
 def test_get_tool_for_system_when_empty(koala_api):
-    api: ToolApi = koala_api.api_tool_factory()
+    api_system: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    tools = api.get_tools_for_system(esw1)
+    esw1_registered = api_system.add_system(esw1)
+    tools = api_system.get_tools_for_system(esw1_registered.identity)
     assert tools == []
 
 
@@ -111,17 +112,17 @@ def test_link_existing_tool_to_existing_sde(koala_api):
     api_tool: ToolApi = koala_api.api_tool_factory()
     api_system: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api_system.add_system(esw1)
+    esw1_db = api_system.add_system(esw1)
 
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api_tool.add_tool(gcc)
+    gcc_db = api_tool.add_tool(gcc)
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
-    api_tool.add_tool(clang)
+    clang_db = api_tool.add_tool(clang)
 
-    api_tool.link_tools_to_system(tools=[gcc, clang], system=esw1)
+    api_tool.link_tools_to_system(tools_id=[gcc_db.identity, clang_db.identity], system_id=esw1_db.identity)
 
-    tools = api_tool.get_tools_for_system(esw1)
+    tools = api_system.get_tools_for_system(esw1_db.identity)
     assert set(tools) == set([gcc, clang])
 
 
@@ -130,17 +131,18 @@ def test_get_all_tools_not_in_any_sde(koala_api):
     api_system: SystemApi = koala_api.api_system_factory()
 
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api_system.add_system(esw1)
+    esw1_registered = api_system.add_system(esw1)
 
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api_tool.add_tool(gcc)
+    gcc_registered = api_tool.add_tool(gcc)
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     api_tool.add_tool(clang)
 
-    api_tool.link_tools_to_system(tools=[gcc], system=esw1)
+    api_tool.link_tools_to_system(tools_id=[gcc_registered.identity], system_id=esw1_registered.identity)
 
     result = api_tool.unlinked_tools()
+
     assert len(result) == 1
     assert set(result) == set([clang])
 

@@ -35,16 +35,6 @@ class Tool(ToolID):
         return self._entity.get_id()
 
 
-def _in(entitylinker: tuple, entity: tuple) -> bool:
-    name = entity[0]
-
-    for link_name in entitylinker:
-        if name == link_name[0]:
-            return True
-
-    return False
-
-
 class ToolMonitor:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client
@@ -54,21 +44,27 @@ class ToolMonitor:
         # SELECT name, version_major, purpose FROM entity
         # WHERE is_system = FALSE
         # AND name NOT IN (SELECT tool_name FROM entitylinker);
+
+        all_linked_tools = self._client.sqlQuery(
+            """
+            SELECT system_tool_id AS system_tool_id FROM entitylinker;
+            """
+        )
+        all_linked_tools_list: List[int] = list(map(lambda x: int(x[0]), all_linked_tools))
         tools = self._client.sqlQuery(
             """
-        SELECT name, version_major, purpose FROM entity WHERE is_system = FALSE;
-        """
+        SELECT id, name, version_major, purpose FROM entity
+        WHERE is_system = FALSE;
+        """,
         )
+        unlinked_tools = []
+        for tool in tools:
+            (tool_id, name, version_major, purpose) = tool
+            if tool_id not in all_linked_tools_list:
+                print(tool_id)
+                unlinked_tools.append(ToolID(name=name, version_major=version_major, purpose=purpose))
 
-        links = self._client.sqlQuery(
-            """
-        SELECT tool_name FROM entitylinker;
-        """
-        )
-
-        resp = [tool for tool in tools if not _in(links, tool)]
-
-        return list(map(lambda x: ToolID(*x), resp))
+        return unlinked_tools
 
     # The order of the columns matters: id, name, version_major, purpose, changed_at, is_system, gmp_relevant
     def _convert_query_tool_id(self, resp: Any) -> List[ToolID]:

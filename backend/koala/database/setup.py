@@ -22,10 +22,8 @@ class DatabaseInitializer:
             """
             CREATE TABLE IF NOT EXISTS entitylinker (
             id INTEGER AUTO_INCREMENT,
-            system_name VARCHAR[128],
-            system_major_version INTEGER,
-            tool_name VARCHAR[128],
-            tool_major_version INTEGER,
+            system_id INTEGER,
+            system_tool_id INTEGER,
             valid BOOLEAN,
             changed_at TIMESTAMP,
             PRIMARY KEY (id)
