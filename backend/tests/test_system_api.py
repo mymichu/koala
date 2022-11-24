@@ -37,21 +37,21 @@ def test_link_existing_sde_to_existing_tool(koala_api):
     api_tool: ToolApi = koala_api.api_tool_factory()
     api_system: SystemApi = koala_api.api_system_factory()
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
-    api_system.add_system(esw1)
+    esw1_db = api_system.add_system(esw1)
 
     project_x = System(name="project x", version_major=1, purpose="building firmware for project X")
-    api_system.add_system(project_x)
+    project_x_db = api_system.add_system(project_x)
 
     project_y = System(name="project y", version_major=2, purpose="building firmware for project Y")
     api_system.add_system(project_y)
 
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    api_tool.add_tool(gcc)
+    gcc_db = api_tool.add_tool(gcc)
 
-    api_tool.link_tools_to_system(tools=[gcc], system=esw1)
-    api_tool.link_tools_to_system(tools=[gcc], system=project_x)
+    api_tool.link_tools_to_system(tools_id=[gcc_db.identity], system_id=esw1_db.identity)
+    api_tool.link_tools_to_system(tools_id=[gcc_db.identity], system_id=project_x_db.identity)
 
-    systems = api_system.get_systems_for_tool(gcc)
+    systems = api_tool.get_systems_for_tool(gcc_db.identity)
     assert set(systems) == set([esw1, project_x])
 
 

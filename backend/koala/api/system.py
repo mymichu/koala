@@ -5,14 +5,13 @@ from immudb import ImmudbClient
 
 from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity as LinkerDocEntityDB
-from koala.database.model import link_system_to_tool as LinkerSystemTool
+from koala.database.model import link_system_to_tool as LinkerSystemToolDB
 from koala.database.model import system as SystemDB
-from koala.database.model import tool as ToolDB
 from koala.database.model.link_docs_to_entity import (
     LinkDocEntity as DatabaseLinkDocEntity,
 )
 
-from .types import Document, System
+from .types import Document, System, Tool
 
 
 @dataclass
@@ -60,11 +59,10 @@ class SystemApi:
         )
         link.add()
 
-    def get_systems_for_tool(self, tool: ToolDB.Tool) -> List[System]:
-        tool_db = ToolDB.Tool(self._client, tool.name, tool.version_major, tool.purpose)
-        system_tool_linker = LinkerSystemTool.LinkSystemToolMonitor(self._client)
-        systems_database = system_tool_linker.get_linked_systems(tool_db)
-        return self._convert(systems_database)
+    def get_tools_for_system(self, system_id: int) -> List[Tool]:
+        system_to_tool_linker = LinkerSystemToolDB.LinkSystemToolMonitor(self._client)
+        tool_database = system_to_tool_linker.get_linked_tools(system_id)
+        return [Tool(tool.name, tool.version_major, tool.purpose, identity=tool.identity) for tool in tool_database]
 
     def get_system_documents(self, system_id: int) -> List[Document]:
         linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)

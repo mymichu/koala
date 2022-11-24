@@ -88,9 +88,7 @@ def test_get_system_status_1_1_document_not_released():
 
 @pytest.mark.order(7)
 def test_put_document_1_to_release():
-    response = requests.put(
-        f"{url}/documents/1/state?state=relased", data={"state": "relased"}
-    )
+    response = requests.put(f"{url}/documents/1/state?state=relased")
     assert response.status_code == 200
 
 
@@ -150,7 +148,7 @@ def test_post_tool_second_element():
 
 
 @pytest.mark.order(13)
-def test_get_empty_tools():
+def test_get_two_added_tools():
     response = requests.get(f"{url}/tools")
     assert response.status_code == 200
     response_body = response.json()
@@ -169,4 +167,76 @@ def test_get_empty_tools():
             "gmp_relevant": True,
             "identity": 3,
         },
+    ]
+
+
+@pytest.mark.order(14)
+def test_get_two_added_tools():
+    response = requests.get(f"{url}/tools")
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body == [
+        {
+            "name": "clang",
+            "purpose": "compiler for x84/64 processors",
+            "version_major": 10,
+            "gmp_relevant": True,
+            "identity": 2,
+        },
+        {
+            "name": "arm-gcc",
+            "purpose": "compiler for arm processors",
+            "version_major": 9,
+            "gmp_relevant": True,
+            "identity": 3,
+        },
+    ]
+
+
+@pytest.mark.order(15)
+def test_no_link_tools_to_esw():
+    response = requests.get(f"{url}/systems/1/tools")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.order(16)
+def test_no_link_arm_compiler_to_esw1():
+    response = requests.get(f"{url}/tools/2/systems")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.order(17)
+def test_link_arm_compiler_to_esw1():
+    response = requests.post(f"{url}/tools/2/systems?system_identity=1")
+    assert response.status_code == 200
+
+
+@pytest.mark.order(18)
+def test_check_link_arm_compiler_to_esw1():
+    response = requests.get(f"{url}/tools/2/systems")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "name": "system 1",
+            "version_major": 1,
+            "purpose": "toolchain for embedded systems",
+            "identity": 1,
+        }
+    ]
+
+
+@pytest.mark.order(18)
+def test_check_link_arm_compiler_to_esw1():
+    response = requests.get(f"{url}/systems/1/tools")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "name": "clang",
+            "purpose": "compiler for x84/64 processors",
+            "version_major": 10,
+            "gmp_relevant": True,
+            "identity": 2,
+        }
     ]

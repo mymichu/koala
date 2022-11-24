@@ -6,7 +6,6 @@ from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity as LinkerDocEntityDB
 from koala.database.model import link_ownership_to_entity as LinkerOwnershipEntityDB
 from koala.database.model import link_system_to_tool as LinkerSystemToolDB
-from koala.database.model import system as SystemDB
 from koala.database.model import tool as ToolDB
 
 from .types import Document, System, Tool
@@ -53,17 +52,9 @@ class ToolApi:
         tool.identity = tool_database.get_id()
         return tool
 
-    def get_tools_for_system(self, system: System) -> List[Tool]:
-        system_db = SystemDB.System(self._client, system.name, system.version_major, system.purpose)
-        system_to_tool_linker = LinkerSystemToolDB.LinkSystemToolMonitor(self._client)
-        tool_database = system_to_tool_linker.get_linked_tools(system_db)
-        return self._convert(tool_database)
-
-    def link_tools_to_system(self, tools: List[Tool], system: System) -> None:
-        system_db = SystemDB.System(self._client, system.name, system.version_major, system.purpose)
-        for tool in tools:
-            tool_db = ToolDB.ToolID(tool.name, tool.version_major, tool.purpose)
-            linker = LinkerSystemToolDB.LinkSystemTool(self._client, system_db, tool_db)
+    def link_tools_to_system(self, tools_id: List[int], system_id: int) -> None:
+        for tool_id in tools_id:
+            linker = LinkerSystemToolDB.LinkSystemTool(self._client, system_id, tool_id)
             linker.add()
 
     def add_tool_owner(self, tool: Tool, owner_email: str) -> None:
@@ -95,3 +86,16 @@ class ToolApi:
             tool_id,
         )
         link.add()
+
+    def get_systems_for_tool(self, tool_id: int) -> List[System]:
+        system_tool_linker = LinkerSystemToolDB.LinkSystemToolMonitor(self._client)
+        systems_database = system_tool_linker.get_linked_systems(tool_id)
+        return [
+            System(
+                system_db.name,
+                version_major=system_db.version_major,
+                purpose=system_db.purpose,
+                identity=system_db.identity,
+            )
+            for system_db in systems_database
+        ]

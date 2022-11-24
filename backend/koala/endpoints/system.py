@@ -9,7 +9,14 @@ from koala.api.system import System as SystemApiModel
 from koala.api.system import SystemApi
 from koala.api.system import SystemStatus as SystemStatusApi
 from koala.api.types import Document as DocumentApiModel
-from koala.endpoints.types import Document, DocumentExtended, System, SystemExtended
+from koala.endpoints.helper import converter
+from koala.endpoints.helper.types import (
+    Document,
+    DocumentExtended,
+    System,
+    SystemExtended,
+    ToolExtended,
+)
 from koala.factory import ContainerApi
 
 router = APIRouter()
@@ -25,34 +32,13 @@ class SystemStatus(BaseModel):
     open_change_requests: int
 
 
-def convert_system(system_api: SystemApiModel) -> SystemExtended:
-    return SystemExtended(
-        name=system_api.name,
-        version_major=system_api.version_major,
-        purpose=system_api.purpose,
-        identity=system_api.identity,
-    )
-
-
-def convert_systems(systems_api: List[SystemApiModel]) -> List[SystemExtended]:
-    return [convert_system(system) for system in systems_api]
-
-
-def convert_document(document: DocumentApiModel) -> DocumentExtended:
-    return DocumentExtended(name=document.name, path=document.path, identity=document.identity)
-
-
-def convert_documents(documents_api: List[DocumentApiModel]) -> List[DocumentExtended]:
-    return [convert_document(document) for document in documents_api]
-
-
 @router.get("/systems/", tags=["systems"], response_model=List[SystemExtended])
 @inject
 async def read_all_systems(
     system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory]),
 ) -> List[SystemExtended]:
     systems_api = system_api.get_all_systems()
-    return convert_systems(systems_api)
+    return converter.convert_systems(systems_api)
 
 
 @router.post("/systems/", tags=["systems"])
@@ -61,7 +47,7 @@ async def create_system(
     system: System, system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory])
 ) -> SystemExtended:
     system_api_model = system_api.add_system(SystemApiModel(system.name, system.version_major, system.purpose))
-    return convert_system(system_api_model)
+    return converter.convert_system(system_api_model)
 
 
 @router.get("/systems/{identity}", tags=["systems"], response_model=SystemStatus)
@@ -86,7 +72,16 @@ async def get_system_documents(
     identity: int, system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory])
 ) -> List[DocumentExtended]:
     documents_api_model = system_api.get_system_documents(identity)
-    return convert_documents(documents_api_model)
+    return converter.convert_documents(documents_api_model)
+
+
+@router.get("/systems/{identity}/tools", tags=["systems"], response_model=List[ToolExtended])
+@inject
+async def get_system_tools(
+    identity: int, system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory])
+) -> List[ToolExtended]:
+    tools_api_model = system_api.get_tools_for_system(identity)
+    return converter.convert_tools(tools_api_model)
 
 
 @router.post("/systems/{identity}/documents", tags=["systems"], response_model=DocumentExtended)
@@ -99,4 +94,4 @@ async def add_create_document_to_system(
 ) -> DocumentExtended:
     document_database = document_api.add_document(DocumentApiModel(document.name, document.path))
     system_api.add_system_document(identity, document_database)
-    return convert_document(document_database)
+    return converter.convert_document(document_database)
