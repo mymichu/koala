@@ -43,7 +43,7 @@ def test_get_all_system_one_element() -> None:
 
 
 @pytest.mark.order(4)
-def test_get_system_status_1_no_elements():
+def test_get_system_status_1_no_elements() -> None:
     response = requests.get(f"{url}/systems/1")
     assert response.status_code == 200
     response_body = response.json()
@@ -63,7 +63,7 @@ def test_get_system_status_1_no_elements():
 
 
 @pytest.mark.order(5)
-def test_post_document_to_system_1():
+def test_post_document_to_system_1() -> None:
     doc_to_add = {"name": "test-doc", "path": "test-path"}
 
     response = requests.post(f"{url}/systems/1/documents", json=doc_to_add)
@@ -73,7 +73,7 @@ def test_post_document_to_system_1():
 
 
 @pytest.mark.order(6)
-def test_get_system_status_1_1_document_not_released():
+def test_get_system_status_1_1_document_not_released() -> None:
     response = requests.get(f"{url}/systems/1")
     assert response.status_code == 200
     response_body = response.json()
@@ -93,13 +93,13 @@ def test_get_system_status_1_1_document_not_released():
 
 
 @pytest.mark.order(7)
-def test_put_document_1_to_release():
+def test_put_document_1_to_release() -> None:
     response = requests.put(f"{url}/documents/1/state?state=relased")
     assert response.status_code == 200
 
 
 @pytest.mark.order(8)
-def test_get_system_status_1_1_document_released():
+def test_get_system_status_1_1_document_released() -> None:
     response = requests.get(f"{url}/systems/1")
     assert response.status_code == 200
     response_body = response.json()
