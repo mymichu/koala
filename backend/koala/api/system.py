@@ -32,7 +32,7 @@ class SystemApi:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client
 
-    def _convert(self, systems: List[SystemDB.SystemID]) -> List[System]:
+    def _convert(self, systems: List[SystemDB.Entity]) -> List[System]:
         return [
             System(system.name, system.version_major, system.purpose, identity=system.identity) for system in systems
         ]
@@ -96,8 +96,8 @@ class SystemApi:
 
     def set_system_productive(self, system_id: int) -> None:
         system = SystemDB.System(self._client, identity=system_id)
-        system.set_active(True)
+        system.set_active_status(True)
 
     def set_system_unproductive(self, system_id: int) -> None:
         system = SystemDB.System(self._client, identity=system_id)
-        system.set_active(False)
+        system.set_active_status(False)

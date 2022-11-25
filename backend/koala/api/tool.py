@@ -25,7 +25,7 @@ class ToolApi:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client
 
-    def _convert(self, tools: List[ToolDB.ToolID]) -> List[Tool]:
+    def _convert(self, tools: List[ToolDB.Entity]) -> List[Tool]:
         return [Tool(tool.name, tool.version_major, tool.purpose, tool.identity, tool.gmp_relevant) for tool in tools]
 
     def get_gmp_relevant_tools(self) -> List[Tool]:
@@ -74,7 +74,7 @@ class ToolApi:
             linker.add()
 
     def add_tool_owner(self, tool: Tool, owner_email: str) -> None:
-        entitiy = ToolDB.ToolID(tool.name, tool.version_major, tool.purpose)
+        entitiy = ToolDB.Entity(tool.name, tool.version_major, tool.purpose)
         linker = LinkerOwnershipEntityDB.LinkOwnershipToEntity(self._client, entitiy, owner_email)
         linker.link()
 
@@ -133,8 +133,8 @@ class ToolApi:
 
     def set_tool_productive(self, tool_id: int) -> None:
         tool = ToolDB.Tool(self._client, identity=tool_id)
-        tool.set_active(True)
+        tool.set_active_status(True)
 
     def set_tool_unproductive(self, tool_id: int) -> None:
         tool = ToolDB.Tool(self._client, identity=tool_id)
-        tool.set_active(False)
+        tool.set_active_status(False)

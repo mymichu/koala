@@ -4,8 +4,7 @@ from typing import List
 
 from immudb import ImmudbClient
 
-from .system import SystemID
-from .tool import ToolID
+from .entity import Entity
 
 
 @dataclass
@@ -71,7 +70,7 @@ class LinkSystemToolMonitor:
     def __init__(self, client: ImmudbClient):
         self._client = client
 
-    def get_linked_tools(self, system_id: int) -> List[ToolID]:
+    def get_linked_tools(self, system_id: int) -> List[Entity]:
         response = self._client.sqlQuery(
             """
             SELECT COUNT(*) FROM entity WHERE id=@system_id AND is_system=TRUE;
@@ -93,11 +92,11 @@ class LinkSystemToolMonitor:
         )
         # TODO: return tool id in the future
         return [
-            ToolID(name=tool_name, version_major=tool_version, purpose=tool_purpose, identity=identity)
+            Entity(name=tool_name, version_major=tool_version, purpose=tool_purpose, identity=identity, is_system=False)
             for (identity, tool_name, tool_version, tool_purpose) in tools_linked
         ]
 
-    def get_linked_systems(self, tool_id: int) -> List[SystemID]:
+    def get_linked_systems(self, tool_id: int) -> List[Entity]:
 
         response = self._client.sqlQuery(
             """
@@ -121,6 +120,8 @@ class LinkSystemToolMonitor:
             },
         )
         return [
-            SystemID(name=system_name, version_major=system_major_version, purpose=purpose, identity=identity)
+            Entity(
+                name=system_name, version_major=system_major_version, purpose=purpose, identity=identity, is_system=True
+            )
             for (identity, system_name, system_major_version, purpose) in systems_linked
         ]
