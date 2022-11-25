@@ -218,7 +218,7 @@ def test_get_all_documents_for_given_tool(koala_api):
     api_tool.add_tool_document(clang_registered.identity, doc_a)
     api_tool.add_tool_document(clang_registered.identity, doc_b)
 
-    result = api_tool.get_tool_documents(clang)
+    result = api_tool.get_tool_documents(clang_registered.identity)
     assert set(result) == set(
         [Document(name="intro", path="path/to/intro"), Document(name="class", path="path/to/class")]
     )

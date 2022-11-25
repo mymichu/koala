@@ -31,8 +31,8 @@ class SystemStatus(BaseModel):
     amount_tools_not_productive: int
     amount_systems_productive: int
     amount_systems_not_productive: int
-    amount_change_request_closed: int
-    amount_change_request_open: int
+    amount_change_requests_closed: int
+    amount_change_requests_open: int
 
 
 @router.get("/systems/", tags=["systems"], response_model=List[SystemExtended])
@@ -67,8 +67,8 @@ async def get_system_status(
         amount_tools_not_productive=system_api_model.amount_tools_not_productive,
         amount_systems_productive=system_api_model.amount_systems_productive,
         amount_systems_not_productive=system_api_model.amount_systems_not_productive,
-        amount_change_request_closed=system_api_model.amount_change_request_closed,
-        amount_change_request_open=system_api_model.amount_change_request_open,
+        amount_change_requests_closed=system_api_model.amount_change_request_closed,
+        amount_change_requests_open=system_api_model.amount_change_request_open,
     )
 
 

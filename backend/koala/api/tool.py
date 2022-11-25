@@ -79,10 +79,7 @@ class ToolApi:
         list_tools = ToolDB.ToolMonitor(self._client).get_all_tools_owned_by(owner_email)
         return self._convert(list_tools)
 
-    def get_tool_documents(self, tool: Tool) -> List[Document]:
-        tool_db = ToolDB.Tool(self._client, tool.name, tool.version_major, tool.purpose, tool.gmp_relevant)
-        tool_id = tool_db.get_id()
-
+    def get_tool_documents(self, tool_id: int) -> List[Document]:
         doc_linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)
         docs_db = doc_linker.get_linked_to_tools(tool_id)
         return [Document(doc_db.name, doc_db.path) for doc_db in docs_db]
