@@ -1,5 +1,3 @@
-from http import client
-
 from dependency_injector import containers, providers
 from immudb import ImmudbClient
 
@@ -42,7 +40,4 @@ class ContainerApi(containers.DeclarativeContainer):
         UserApi,
         client=immuclient,
     )
-    api_change_factory = providers.Factory(
-        ChangeApi,
-        client=immuclient
-    )
+    api_change_factory = providers.Factory(ChangeApi, client=immuclient)
