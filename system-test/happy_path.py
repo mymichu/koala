@@ -57,8 +57,8 @@ def test_get_system_status_1_no_elements() -> None:
         "amount_tools_not_productive": 0,
         "amount_systems_productive": 0,
         "amount_systems_not_productive": 0,
-        "amount_change_request_closed": 0,
-        "amount_change_request_open": 0,
+        "amount_change_requests_closed": 0,
+        "amount_change_requests_open": 0,
     }
 
 
@@ -87,8 +87,8 @@ def test_get_system_status_1_1_document_not_released() -> None:
         "amount_tools_not_productive": 0,
         "amount_systems_productive": 0,
         "amount_systems_not_productive": 0,
-        "amount_change_request_closed": 0,
-        "amount_change_request_open": 0,
+        "amount_change_requests_closed": 0,
+        "amount_change_requests_open": 0,
     }
 
 
@@ -113,8 +113,8 @@ def test_get_system_status_1_1_document_released() -> None:
         "amount_tools_not_productive": 0,
         "amount_systems_productive": 0,
         "amount_systems_not_productive": 0,
-        "amount_change_request_closed": 0,
-        "amount_change_request_open": 0,
+        "amount_change_requests_closed": 0,
+        "amount_change_requests_open": 0,
     }
 
 
@@ -236,8 +236,8 @@ def test_check_link_arm_compiler_to_esw1():
     ]
 
 
-@pytest.mark.order(18)
-def test_check_link_arm_compiler_to_esw1():
+@pytest.mark.order(19)
+def test_check_link_arm_compiler_to_clang():
     response = requests.get(f"{url}/systems/1/tools")
     assert response.status_code == 200
     assert response.json() == [
@@ -249,3 +249,41 @@ def test_check_link_arm_compiler_to_esw1():
             "identity": 2,
         }
     ]
+
+
+@pytest.mark.order(20)
+def test_check_get_status_tool_no_documents():
+    response = requests.get(f"{url}/tools/2")
+    assert response.status_code == 200
+    assert response.json() == {
+        "is_productive": False,
+        "amount_documents_released": 0,
+        "amount_documents_unreleased": 0,
+        "amount_change_requests_closed": 0,
+        "amount_change_requests_open": 0,
+    }
+
+
+@pytest.mark.order(21)
+def test_post_document_to_tools_1():
+    doc_to_add = {"name": "test-doc-tool", "path": "test-path-tool"}
+
+    response = requests.post(f"{url}/tools/2/documents", json=doc_to_add)
+    assert response.status_code == 200
+    assert response.json() == {
+        "name": "test-doc-tool",
+        "path": "test-path-tool",
+        "identity": 2,
+    }
+
+
+@pytest.mark.order(22)
+def test_check_get_status_tool_added_documentsdasdass():
+    response = requests.get(f"{url}/tools/2")
+    assert response.json() == {
+        "is_productive": False,
+        "amount_documents_released": 0,
+        "amount_documents_unreleased": 1,
+        "amount_change_requests_closed": 0,
+        "amount_change_requests_open": 0,
+    }
