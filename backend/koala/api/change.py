@@ -12,9 +12,12 @@ class ChangeApi:
         self._client = client
 
     def _convert(self, changes: List[ChangeDB.ChangeID]) -> List[Change]:
-        return [Change(change.entity_id, change.requester_id, change.reviewer_id, change.description, change.identity) for change in changes]
+        return [
+            Change(change.entity_id, change.requester_id, change.reviewer_id, change.description, change.identity)
+            for change in changes
+        ]
 
-    def add_change(self, change: Change) -> None:
+    def add_change(self, change: Change) -> Change:
         change_database = ChangeDB.Change(
             self._client,
             entity_id=change.entity_id,
@@ -25,7 +28,6 @@ class ChangeApi:
         change_database.add()
         change.identity = change_database.get_id()
         return change
-
 
     def get_all_changes(self) -> List[Change]:
         monitor_database = ChangeDB.Change(self._client)

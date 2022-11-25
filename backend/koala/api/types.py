@@ -69,5 +69,5 @@ class User:
     name: str
     first_name: str
     email: str
-    active: bool = True
+    active: bool
     identity: int = -1

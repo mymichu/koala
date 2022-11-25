@@ -16,6 +16,7 @@ class ChangeID:
 
 
 class Change(ChangeID):
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         client: ImmudbClient,
