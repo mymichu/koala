@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any, List
 
 from immudb import ImmudbClient
@@ -6,13 +5,8 @@ from immudb import ImmudbClient
 from .entity import DataBaseEntity, Entity
 
 
-@dataclass
-class ToolID(Entity):
-    is_system: bool = False
-
-
 # pylint: disable=too-many-arguments
-class Tool(ToolID):
+class Tool(DataBaseEntity):
     def __init__(
         self,
         client: ImmudbClient,
@@ -23,38 +17,22 @@ class Tool(ToolID):
         gmp_relevant: bool = True,
     ) -> None:
         super().__init__(
-            name=name, version_major=version_major, purpose=purpose, identity=identity, gmp_relevant=gmp_relevant
+            client=client,
+            name=name,
+            version_major=version_major,
+            purpose=purpose,
+            gmp_relevant=gmp_relevant,
+            identity=identity,
+            is_system=False,
         )
         self._client = client
-        self._entity = DataBaseEntity(
-            client=client,
-            entity=ToolID(
-                name=name,
-                version_major=version_major,
-                purpose=purpose,
-                gmp_relevant=gmp_relevant,
-                identity=identity,
-            ),
-        )
-
-    def add(self) -> None:
-        self._entity.insert()
-
-    def get_id(self) -> int:
-        return self._entity.get_id()
-
-    def is_active(self) -> bool:
-        return self._entity.is_active()
-
-    def set_active(self, active: bool) -> None:
-        return self._entity.set_active_status(active)
 
 
 class ToolMonitor:
     def __init__(self, client: ImmudbClient) -> None:
         self._client = client
 
-    def unlinked_tools(self) -> List[ToolID]:
+    def unlinked_tools(self) -> List[Entity]:
         # TODO: This should be done by database with
         # SELECT name, version_major, purpose FROM entity
         # WHERE is_system = FALSE
@@ -77,16 +55,16 @@ class ToolMonitor:
             (tool_id, name, version_major, purpose) = tool
             if tool_id not in all_linked_tools_list:
                 print(tool_id)
-                unlinked_tools.append(ToolID(name=name, version_major=version_major, purpose=purpose))
+                unlinked_tools.append(Entity(name=name, version_major=version_major, purpose=purpose))
 
         return unlinked_tools
 
     # The order of the columns matters: id, name, version_major, purpose, changed_at, is_system, gmp_relevant
-    def _convert_query_tool_id(self, resp: Any) -> List[ToolID]:
-        tools: List[ToolID] = []
+    def _convert_query_tool_id(self, resp: Any) -> List[Entity]:
+        tools: List[Entity] = []
         for item in resp:
             (identiy, name, version_major, purpose, changed_at, is_system, gmp_relevant) = item
-            tool = ToolID(
+            tool = Entity(
                 name=name,
                 version_major=version_major,
                 purpose=purpose,
@@ -98,7 +76,7 @@ class ToolMonitor:
             tools.append(tool)
         return tools
 
-    def get_all_tools(self) -> List[ToolID]:
+    def get_all_tools(self) -> List[Entity]:
         resp = self._client.sqlQuery(
             """
         SELECT id, name, version_major, purpose, changed_at, is_system, gmp_relevant FROM entity WHERE is_system = FALSE;
@@ -106,7 +84,7 @@ class ToolMonitor:
         )
         return self._convert_query_tool_id(resp)
 
-    def get_tools(self, name: str) -> List[ToolID]:
+    def get_tools(self, name: str) -> List[Entity]:
         resp = self._client.sqlQuery(
             """
         SELECT name, version_major, purpose, gmp_relevant FROM entity
@@ -114,27 +92,27 @@ class ToolMonitor:
         """,
             params={"name": name},
         )
-        return list(map(lambda x: ToolID(*x), resp))
+        return list(map(lambda x: Entity(*x), resp))
 
-    def get_gmp_relevant_tools(self) -> List[ToolID]:
+    def get_gmp_relevant_tools(self) -> List[Entity]:
         resp = self._client.sqlQuery(
             """
         SELECT name, version_major, purpose FROM entity
         WHERE gmp_relevant = TRUE AND is_system = FALSE;
         """
         )
-        return list(map(lambda x: ToolID(*x), resp))
+        return list(map(lambda x: Entity(*x), resp))
 
-    def get_non_gmp_relevant_tools(self) -> List[ToolID]:
+    def get_non_gmp_relevant_tools(self) -> List[Entity]:
         resp = self._client.sqlQuery(
             """
         SELECT name, version_major, purpose FROM entity
         WHERE gmp_relevant = FALSE AND is_system = FALSE;
         """
         )
-        return list(map(lambda x: ToolID(*x), resp))
+        return list(map(lambda x: Entity(*x), resp))
 
-    def get_all_tools_owned_by(self, email: str) -> List[ToolID]:
+    def get_all_tools_owned_by(self, email: str) -> List[Entity]:
         resp = self._client.sqlQuery(
             """
             SELECT entity.id, entity.name, entity.version_major, entity.purpose, entity.changed_at, entity.is_system, entity.gmp_relevant

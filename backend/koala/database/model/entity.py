@@ -19,12 +19,31 @@ class Entity(EntityKey):
     identity: int = -1
 
 
-class DataBaseEntity:
-    def __init__(self, client: ImmudbClient, entity: Entity) -> None:
+# pylint: disable=too-many-arguments
+class DataBaseEntity(Entity):
+    def __init__(
+        self,
+        client: ImmudbClient,
+        name: str,
+        version_major: int,
+        purpose: str,
+        is_system: bool,
+        gmp_relevant: bool,
+        change_at: datetime = datetime.now(),  # TODO: Not sure if this is needed
+        identity: int = -1,
+    ) -> None:
+        super().__init__(
+            name=name,
+            version_major=version_major,
+            purpose=purpose,
+            is_system=is_system,
+            gmp_relevant=gmp_relevant,
+            change_at=change_at,
+            identity=identity,
+        )
         self._client = client
-        self._entity = entity
 
-    def insert(self) -> None:
+    def add(self) -> None:
         self._check_name_version_purpose()
         self._client.sqlExec(
             """
@@ -34,24 +53,24 @@ class DataBaseEntity:
         COMMIT;
         """,
             params={
-                "name": self._entity.name,
-                "version_major": self._entity.version_major,
-                "purpose": self._entity.purpose,
-                "is_system": self._entity.is_system,
-                "gmp_relevant": self._entity.gmp_relevant,
+                "name": self.name,
+                "version_major": self.version_major,
+                "purpose": self.purpose,
+                "is_system": self.is_system,
+                "gmp_relevant": self.gmp_relevant,
             },
         )
 
     def _check_name_version_purpose(self) -> None:
-        if len(self._entity.name) == 0:
+        if len(self.name) == 0:
             raise ValueError("Entity name cannot be empty")
-        if len(self._entity.purpose) == 0:
+        if len(self.purpose) == 0:
             raise ValueError("Entity purpose cannot be empty")
-        if self._entity.version_major < 0:
+        if self.version_major < 0:
             raise ValueError("Entity version cannot be negative")
 
     def _check_id(self) -> None:
-        if self._entity.identity == -1:
+        if self.identity == -1:
             raise ValueError("Entity ID not set")
 
     def get_id(self) -> int:
@@ -66,16 +85,16 @@ class DataBaseEntity:
                 AND is_system = @is_system;
                 """,
             params={
-                "name": self._entity.name,
-                "version_major": self._entity.version_major,
-                "purpose": self._entity.purpose,
-                "is_system": self._entity.is_system,
+                "name": self.name,
+                "version_major": self.version_major,
+                "purpose": self.purpose,
+                "is_system": self.is_system,
             },
         )
         if len(resp) != 1:
             raise Exception("Entity not found")
-        self._entity.identity = int(resp[0][0])
-        return self._entity.identity
+        self.identity = int(resp[0][0])
+        return self.identity
 
     def is_active(self) -> bool:
         self._check_id()
@@ -86,7 +105,7 @@ class DataBaseEntity:
                 WHERE id = @identity;
                 """,
             params={
-                "identity": self._entity.identity,
+                "identity": self.identity,
             },
         )
         if len(resp) != 1:
@@ -102,5 +121,5 @@ class DataBaseEntity:
                 VALUES (@id, @is_active, NOW());
             COMMIT;
             """,
-            params={"id": self._entity.identity, "is_active": is_active},
+            params={"id": self.identity, "is_active": is_active},
         )
