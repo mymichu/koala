@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -32,3 +34,20 @@ class Tool(Entitiy):
 
 class ToolExtended(Tool):
     identity: int
+
+
+class Ownership(BaseModel):
+    systems: List[SystemExtended] = []
+    tools: List[ToolExtended] = []
+
+
+class User(BaseModel):
+    name: str
+    first_name: str
+    email: str
+
+
+class UserExtended(User):
+    active: bool = True
+    identity: int = -1
+    ownership: Ownership = Ownership()

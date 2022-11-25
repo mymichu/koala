@@ -4,7 +4,7 @@ import uvicorn
 from dependency_injector import providers
 from fastapi import FastAPI
 
-from koala.endpoints import document, system, tools
+from koala.endpoints import document, system, tools, user
 from koala.factory import ContainerApi, ContainerDatabase
 
 host = os.getenv("IMMUDB_HOST", "database")
@@ -37,6 +37,7 @@ def create_application() -> FastAPI:
     app.include_router(tools.router)
     app.include_router(system.router)
     app.include_router(document.router)
+    app.include_router(user.router)
     return app
 
 

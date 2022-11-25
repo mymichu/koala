@@ -111,7 +111,7 @@ class DatabaseInitializer:
             CREATE TABLE IF NOT EXISTS entity_ownership (
                 id INTEGER AUTO_INCREMENT,
                 entity_id INTEGER,
-                owner_email VARCHAR[256],
+                owner_id INTEGER,
                 active BOOLEAN,
                 PRIMARY KEY id
                 );"""

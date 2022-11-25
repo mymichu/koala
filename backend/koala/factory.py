@@ -18,7 +18,7 @@ class ContainerDatabase(containers.DeclarativeContainer):
 
 class ContainerApi(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        modules=[".endpoints.tools", ".endpoints.system", ".endpoints.document"]
+        modules=[".endpoints.tools", ".endpoints.system", ".endpoints.document", ".endpoints.user"]
     )
 
     config = providers.Configuration(strict=True)

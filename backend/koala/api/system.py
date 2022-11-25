@@ -5,6 +5,7 @@ from immudb import ImmudbClient
 
 from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity as LinkerDocEntityDB
+from koala.database.model import link_ownership_to_entity as LinkerOwnershipEntityDB
 from koala.database.model import link_system_to_tool as LinkerSystemToolDB
 from koala.database.model import system as SystemDB
 from koala.database.model.link_docs_to_entity import (
@@ -101,3 +102,11 @@ class SystemApi:
     def set_system_unproductive(self, system_id: int) -> None:
         system = SystemDB.System(self._client, identity=system_id)
         system.set_active_status(False)
+
+    def add_system_owner(self, system_id: int, owner_id: int) -> None:
+        LinkerOwnershipEntityDB.LinkOwnershipToEntity(self._client, system_id, owner_id).link()
+
+    # TODO: move that to user api - is more logical
+    def get_all_system_owned_by(self, owner_id: int) -> List[System]:
+        list_tools = SystemDB.SystemMonitor(self._client).get_all_system_owned_by(owner_id)
+        return self._convert(list_tools)
