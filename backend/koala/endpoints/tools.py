@@ -99,3 +99,11 @@ async def get_system_tools(
 ) -> List[SystemExtended]:
     system_api_models = tool_api.get_systems_for_tool(identity)
     return converter.convert_systems(system_api_models)
+
+
+@router.post("/tools/{identity}/owner", tags=["tools"])
+@inject
+async def add_tool_owner(
+    identity: int, owner_identity: int, tool_api: ToolApi = Depends(Provide[ContainerApi.api_tool_factory])
+) -> None:
+    tool_api.add_tool_owner(identity, owner_identity)

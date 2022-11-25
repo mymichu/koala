@@ -1,39 +1,38 @@
 from immudb import ImmudbClient
 
-from .entity import EntityKey
-
 
 class LinkOwnershipToEntity:
-    def __init__(self, client: ImmudbClient, entity_key: EntityKey, owner_email: str):
+    def __init__(self, client: ImmudbClient, entity_id: int, owner_id: int):
         self._client = client
-        self._entity_key = entity_key
-        self._owner_email = owner_email
+        self._entity_id = entity_id
+        self._owner_id = owner_id
 
     def link(self) -> None:
-        # TODO: Merge it to one query this is not supported with immudb
-        resp_entity = self._client.sqlQuery(
+        response_entity = self._client.sqlQuery(
             """
-            SELECT entity.id, user.email FROM entity
-            INNER JOIN user ON user.email = @owner_email
-            WHERE entity.name = @entity_name AND entity.version_major = @entity_version_major AND entity.purpose = @entity_purpose""",
+            SELECT COUNT(*) FROM entity WHERE id=@entity_id;
+            """,
+            params={"entity_id": self._entity_id},
+        )
+        response_user = self._client.sqlQuery(
+            """
+            SELECT COUNT(*) FROM user WHERE id=@owner_id;
+            """,
+            params={"owner_id": self._owner_id},
+        )
+
+        if response_entity[0][0] != 1 or response_user[0][0] != 1:
+            raise ValueError("Entity or User does not exist")
+
+        self._client.sqlExec(
+            """
+        BEGIN TRANSACTION;
+        INSERT INTO entity_ownership(entity_id, owner_id)
+        VALUES( @entity_id, @owner_id );
+        COMMIT;
+            """,
             params={
-                "entity_name": self._entity_key.name,
-                "entity_version_major": self._entity_key.version_major,
-                "entity_purpose": self._entity_key.purpose,
-                "owner_email": self._owner_email,
+                "entity_id": self._entity_id,
+                "owner_id": self._owner_id,
             },
         )
-        (entityid, email) = resp_entity[0]
-        if email == self._owner_email:
-            self._client.sqlExec(
-                """
-            BEGIN TRANSACTION;
-            INSERT INTO entity_ownership(entity_id, owner_email)
-            VALUES( @entity_id, @owner_email );
-            COMMIT;
-                """,
-                params={
-                    "entity_id": entityid,
-                    "owner_email": self._owner_email,
-                },
-            )

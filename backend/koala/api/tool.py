@@ -70,13 +70,13 @@ class ToolApi:
             linker = LinkerSystemToolDB.LinkSystemTool(self._client, system_id, tool_id)
             linker.add()
 
-    def add_tool_owner(self, tool: Tool, owner_email: str) -> None:
-        entitiy = ToolDB.Entity(tool.name, tool.version_major, tool.purpose)
-        linker = LinkerOwnershipEntityDB.LinkOwnershipToEntity(self._client, entitiy, owner_email)
+    def add_tool_owner(self, tool_id: int, owner_id: int) -> None:
+        linker = LinkerOwnershipEntityDB.LinkOwnershipToEntity(self._client, tool_id, owner_id)
         linker.link()
 
-    def get_all_tools_owned_by(self, owner_email: str) -> List[Tool]:
-        list_tools = ToolDB.ToolMonitor(self._client).get_all_tools_owned_by(owner_email)
+    # TODO: move that to user api - is more logical
+    def get_all_tools_owned_by(self, owner_id: int) -> List[Tool]:
+        list_tools = ToolDB.ToolMonitor(self._client).get_all_tools_owned_by(owner_id)
         return self._convert(list_tools)
 
     def get_tool_documents(self, tool_id: int) -> List[Document]:

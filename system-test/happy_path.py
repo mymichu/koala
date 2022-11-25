@@ -287,3 +287,50 @@ def test_check_get_status_tool_added_documentsdasdass():
         "amount_change_requests_closed": 0,
         "amount_change_requests_open": 0,
     }
+
+
+@pytest.mark.order(23)
+def test_post_add_usr():
+    user = {"name": "Muster", "first_name": "Max", "email": "max.muster@email.com"}
+
+    response = requests.post(f"{url}/user", json=user)
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body["identity"] == 1
+
+
+@pytest.mark.order(23)
+def test_link_systems_tools_and_get_status():
+    # link tool clang with max-muster
+    requests.post(f"{url}/tools/2/owner?owner_identity=1")
+    # link system 1 with max-muster
+    requests.post(f"{url}/systems/1/owner?owner_identity=1")
+    response = requests.get(f"{url}/user/1")
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body == {
+        "name": "Muster",
+        "first_name": "Max",
+        "email": "max.muster@email.com",
+        "active": True,
+        "identity": 1,
+        "ownership": {
+            "systems": [
+                {
+                    "name": "system 1",
+                    "version_major": 1,
+                    "purpose": "toolchain for embedded systems",
+                    "identity": 1,
+                }
+            ],
+            "tools": [
+                {
+                    "name": "clang",
+                    "purpose": "compiler for x84/64 processors",
+                    "version_major": 10,
+                    "gmp_relevant": True,
+                    "identity": 2,
+                }
+            ],
+        },
+    }

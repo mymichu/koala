@@ -190,13 +190,12 @@ def test_get_all_tools_owned_by_given_user(koala_api):
 
     clang = Tool(name="clang", version_major=13, purpose="compiler")
     gcc = Tool(name="gcc", version_major=14, purpose="compiler")
-    email_max = "max.muster@email.com"
-    api_tool.add_tool(clang)
-    api_tool.add_tool(gcc)
-    api_user.add_user(UserData(name="muster", first_name="max", email="max.muster@email.com"))
-    api_tool.add_tool_owner(tool=clang, owner_email=email_max)
-    api_tool.add_tool_owner(tool=gcc, owner_email=email_max)
-    tools = api_tool.get_all_tools_owned_by(email_max)
+    clang_registered = api_tool.add_tool(clang)
+    gcc_registered = api_tool.add_tool(gcc)
+    registered_user = api_user.add_user(UserData(name="muster", first_name="max", email="max.muster@email.com"))
+    api_tool.add_tool_owner(tool_id=clang_registered.identity, owner_id=registered_user.identity)
+    api_tool.add_tool_owner(tool_id=gcc_registered.identity, owner_id=registered_user.identity)
+    tools = api_tool.get_all_tools_owned_by(registered_user.identity)
     assert len(tools) == 2
     assert set(tools) == set([gcc, clang])
 

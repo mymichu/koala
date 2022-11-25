@@ -101,3 +101,11 @@ async def add_create_document_to_system(
     document_database = document_api.add_document(DocumentApiModel(document.name, document.path))
     system_api.add_system_document(identity, document_database)
     return converter.convert_document(document_database)
+
+
+@router.post("/systems/{identity}/owner", tags=["systems"])
+@inject
+async def add_system_owner(
+    identity: int, owner_identity: int, system_api: SystemApi = Depends(Provide[ContainerApi.api_system_factory])
+) -> None:
+    system_api.add_system_owner(identity, owner_identity)
