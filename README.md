@@ -5,9 +5,9 @@
 Prerequisite: wget and Docker-Compose needs to be installed
 
 1. Download the Docker-Compose file and start the docker-compose:
-    ```bash 
+    ```bash
     wget https://raw.githubusercontent.com/mymichu/koala/main/infrastructure/docker-compose.yml \
-    && docker-compose up 
+    && docker-compose up
     ```
 
 2. Now koala should be reachable. Open the Browser and connect to the [Koala-Swagger-API ](http://localhost:8002/docs)
