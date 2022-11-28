@@ -17,7 +17,6 @@ def test_add_one_sde(koala_api):
     esw1 = System(name="eSW", version_major=1, purpose="building firmware")
     api.add_system(esw1)
     all_sdes = api.get_all_systems()
-    print(all_sdes)
     assert set(all_sdes) == set([esw1])
 
 

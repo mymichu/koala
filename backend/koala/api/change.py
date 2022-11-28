@@ -29,7 +29,20 @@ class ChangeApi:
         change.identity = change_database.get_id()
         return change
 
+    def review_change(self, change_id: int, reviewer_id: int) -> None:
+        monitor_database = ChangeDB.Change(self._client, identity=change_id)
+        monitor_database.update_reviewer(reviewer_id)
+
     def get_all_changes(self) -> List[Change]:
         monitor_database = ChangeDB.Change(self._client)
-        tool_database = monitor_database.get_all_changes()
-        return self._convert(tool_database)
+        change_database = monitor_database.get_all_changes()
+        return self._convert(change_database)
+
+    def get_all_changes_open(self) -> List[Change]:
+        monitor_database = ChangeDB.Change(self._client)
+        change_database = monitor_database.get_all_changes_open()
+        return self._convert(change_database)
+
+    def update_reviewer(self, change_id: int, reviewer_id: int) -> None:
+        monitor_database = ChangeDB.Change(self._client, identity=change_id)
+        monitor_database.update_reviewer(reviewer_id)

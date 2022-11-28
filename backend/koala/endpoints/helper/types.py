@@ -51,3 +51,14 @@ class UserExtended(User):
     active: bool = True
     identity: int = -1
     ownership: Ownership = Ownership()
+
+
+class Change(BaseModel):
+    entity_id: int
+    requester_id: int
+    description: str
+
+
+class ChangeExtended(Change):
+    reviewer_id: int
+    identity: int

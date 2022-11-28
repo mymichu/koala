@@ -32,8 +32,6 @@ def test_get_all_system_one_element() -> None:
     response = requests.get(f"{url}/systems")
     assert response.status_code == 200
     response_body = response.json()
-    print(response_body)
-    print(type(response_body))
     assert response_body[0] == {
         "name": "system 1",
         "version_major": 1,
@@ -47,8 +45,6 @@ def test_get_system_status_1_no_elements() -> None:
     response = requests.get(f"{url}/systems/1")
     assert response.status_code == 200
     response_body = response.json()
-    print(response_body)
-    print(type(response_body))
     assert response_body == {
         "is_productive": False,
         "amount_documents_released": 0,
@@ -77,8 +73,6 @@ def test_get_system_status_1_1_document_not_released() -> None:
     response = requests.get(f"{url}/systems/1")
     assert response.status_code == 200
     response_body = response.json()
-    print(response_body)
-    print(type(response_body))
     assert response_body == {
         "is_productive": False,
         "amount_documents_released": 0,
@@ -103,8 +97,6 @@ def test_get_system_status_1_1_document_released() -> None:
     response = requests.get(f"{url}/systems/1")
     assert response.status_code == 200
     response_body = response.json()
-    print(response_body)
-    print(type(response_body))
     assert response_body == {
         "is_productive": False,
         "amount_documents_released": 1,
@@ -299,7 +291,7 @@ def test_post_add_usr():
     assert response_body["identity"] == 1
 
 
-@pytest.mark.order(23)
+@pytest.mark.order(24)
 def test_link_systems_tools_and_get_status():
     # link tool clang with max-muster
     requests.post(f"{url}/tools/2/owner?owner_identity=1")
@@ -333,4 +325,44 @@ def test_link_systems_tools_and_get_status():
                 }
             ],
         },
+    }
+
+
+@pytest.mark.order(25)
+def test_post_add_change_to_clang():
+    user = {"entity_id": 2, "requester_id": 1, "description": "First Change"}
+
+    response = requests.post(f"{url}/change", json=user)
+    assert response.status_code == 200
+    response_body = response.json()
+    assert response_body["identity"] == 1
+
+
+@pytest.mark.order(26)
+def test_check_get_status_tool_added_change_open():
+    response = requests.get(f"{url}/tools/2")
+    assert response.json() == {
+        "is_productive": False,
+        "amount_documents_released": 0,
+        "amount_documents_unreleased": 1,
+        "amount_change_requests_closed": 0,
+        "amount_change_requests_open": 1,
+    }
+
+
+@pytest.mark.order(27)
+def test_update_change_reviewer():
+    response = requests.put(f"{url}/change/1/reviewer?reviewer_id=1")
+    assert response.status_code == 200
+
+
+@pytest.mark.order(28)
+def test_check_get_status_tool_added_change_closed():
+    response = requests.get(f"{url}/tools/2")
+    assert response.json() == {
+        "is_productive": False,
+        "amount_documents_released": 0,
+        "amount_documents_unreleased": 1,
+        "amount_change_requests_closed": 1,
+        "amount_change_requests_open": 0,
     }

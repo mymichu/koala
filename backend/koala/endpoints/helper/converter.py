@@ -1,11 +1,18 @@
 from typing import List
 
+from koala.api.change import Change as ChangeApiModel
 from koala.api.document import Document as DocumentApiModel
 from koala.api.system import System as SystemApiModel
 from koala.api.tool import Tool as ToolApiModel
 from koala.api.user import UserData as UserDataApi
 
-from .types import DocumentExtended, SystemExtended, ToolExtended, UserExtended
+from .types import (
+    ChangeExtended,
+    DocumentExtended,
+    SystemExtended,
+    ToolExtended,
+    UserExtended,
+)
 
 
 def convert_tool(tool_api: ToolApiModel) -> ToolExtended:
@@ -20,6 +27,20 @@ def convert_tool(tool_api: ToolApiModel) -> ToolExtended:
 
 def convert_tools(tool_api: List[ToolApiModel]) -> List[ToolExtended]:
     return [convert_tool(tool) for tool in tool_api]
+
+
+def convert_change(change_api: ChangeApiModel) -> ChangeExtended:
+    return ChangeExtended(
+        entity_id=change_api.entity_id,
+        requester_id=change_api.requester_id,
+        reviewer_id=change_api.reviewer_id,
+        description=change_api.description,
+        identity=change_api.identity,
+    )
+
+
+def convert_changes(change_api: List[ChangeApiModel]) -> List[ChangeExtended]:
+    return [convert_change(change) for change in change_api]
 
 
 def convert_system(system_api: SystemApiModel) -> SystemExtended:
