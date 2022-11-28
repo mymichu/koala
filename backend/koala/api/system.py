@@ -3,6 +3,7 @@ from typing import List
 
 from immudb import ImmudbClient
 
+from koala.database.model import change as ChangeDB
 from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity as LinkerDocEntityDB
 from koala.database.model import link_ownership_to_entity as LinkerOwnershipEntityDB
@@ -43,7 +44,6 @@ class SystemApi:
         systems_database = monitor_database.get_all_systems()
         systems: List[System] = []
         for system_db in systems_database:
-            print(system_db)
             systems.append(
                 System(system_db.name, system_db.version_major, system_db.purpose, identity=system_db.identity)
             )
@@ -79,10 +79,13 @@ class SystemApi:
     def get_system_status(self, system_id: int) -> SystemStatus:
         system = SystemDB.System(self._client, identity=system_id)
         linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)
+        changes = ChangeDB.Change(self._client)
         is_productive = system.is_active()
         released_docs = linker.get_amount_of_documents_of_entity(system_id, is_released=True)
         unreleased_docs = linker.get_amount_of_documents_of_entity(system_id, is_released=False)
-        # TODO: add change requests status
+        closed_change_requests = changes.get_amount_changes_reviewed(system_id)
+        open_change_requests = changes.get_amount_changes_not_reviewed(system_id)
+
         return SystemStatus(
             is_productive=is_productive,
             amount_documents_released=released_docs,
@@ -91,8 +94,8 @@ class SystemApi:
             amount_tools_not_productive=0,
             amount_systems_productive=0,
             amount_systems_not_productive=0,
-            amount_change_request_closed=0,
-            amount_change_request_open=0,
+            amount_change_request_closed=closed_change_requests,
+            amount_change_request_open=open_change_requests,
         )
 
     def set_system_productive(self, system_id: int) -> None:

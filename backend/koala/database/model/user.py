@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List
 
 from immudb import ImmudbClient
 
@@ -28,7 +28,7 @@ class User:
 
     # The order of the columns matters: identity, name, first_name, active, email, created_at
     def _convert_query_user_data(self, resp: Any) -> UserData:
-        (identity, name, first_name, active, email, _) = resp[0]
+        (identity, name, first_name, active, email, _) = resp
         user = UserData(
             name=name,
             first_name=first_name,
@@ -92,4 +92,16 @@ class User:
             """,
             params={"id": self._user.identity},
         )
-        return self._convert_query_user_data(resp)
+        return self._convert_query_user_data(resp[0])
+
+    def get_owners(self, entity_id: int) -> List[UserData]:
+        resp = self._client.sqlQuery(
+            """
+            SELECT user.id, user.name, user.first_name, user.active, user.email, user.created_at FROM entity_ownership
+            INNER JOIN user ON user.id = entity_ownership.user_id
+            WHERE  entity_ownership.id=@entity_id;
+            """,
+            params={"entity_id": entity_id},
+        )
+
+        return [self._convert_query_user_data(owner) for owner in resp]

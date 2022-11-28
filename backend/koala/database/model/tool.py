@@ -54,7 +54,6 @@ class ToolMonitor:
         for tool in tools:
             (tool_id, name, version_major, purpose) = tool
             if tool_id not in all_linked_tools_list:
-                print(tool_id)
                 unlinked_tools.append(Entity(name=name, version_major=version_major, purpose=purpose))
 
         return unlinked_tools

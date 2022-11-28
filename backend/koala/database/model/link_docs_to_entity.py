@@ -25,7 +25,6 @@ class LinkDocEntity(LinkDocEntityID):
             """,
             params={"entity_id": self.entity_id},
         )
-        print(self.entity_id)
         if len(resp) != 1 or resp[0][0] != self.entity_id:
             raise Exception("Entity does not exist")
 

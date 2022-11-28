@@ -3,6 +3,7 @@ from typing import List
 
 from immudb import ImmudbClient
 
+from koala.database.model import change as ChangeDB
 from koala.database.model import document as DocumentDB
 from koala.database.model import link_docs_to_entity as LinkerDocEntityDB
 from koala.database.model import link_ownership_to_entity as LinkerOwnershipEntityDB
@@ -111,11 +112,13 @@ class ToolApi:
     def get_tool_status(self, tool_id: int) -> ToolStatus:
         tool = ToolDB.Tool(self._client, identity=tool_id)
         linker = LinkerDocEntityDB.LinkDocEntityMonitor(self._client)
+        changes = ChangeDB.Change(self._client)
+
         is_productive = tool.is_active()
         released_docs = linker.get_amount_of_documents_of_entity(tool_id, is_released=True)
         unreleased_docs = linker.get_amount_of_documents_of_entity(tool_id, is_released=False)
-        closed_change_requests = 0  # TODO: add change request api
-        open_change_requests = 0  # TODO: add change request api
+        closed_change_requests = changes.get_amount_changes_reviewed(tool_id)
+        open_change_requests = changes.get_amount_changes_not_reviewed(tool_id)
 
         return ToolStatus(
             is_productive=is_productive,

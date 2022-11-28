@@ -4,7 +4,8 @@ import uvicorn
 from dependency_injector import providers
 from fastapi import FastAPI
 
-from koala.endpoints import document, system, tools, user
+from koala.database.setup import DatabaseInitializer
+from koala.endpoints import change, document, system, tools, user
 from koala.factory import ContainerApi, ContainerDatabase
 
 host = os.getenv("IMMUDB_HOST", "database")
@@ -13,6 +14,15 @@ URL = f"{host}:3322"
 USERNAME = os.getenv("IMMUDB_USR", "immudb")
 PASSWORD = os.getenv("IMMUDB_PW", "immudb")
 HOST = os.getenv("HOST", "127.0.0.1")
+DATABASE_SETUP_MODE = os.getenv("RESTART_DB", "RESET")  # RESET, KEEP
+
+
+def setup_database(database: DatabaseInitializer) -> None:
+    if DATABASE_SETUP_MODE == "RESET":
+        database.delete()
+    database.create_and_use()
+    if DATABASE_SETUP_MODE == "RESET":
+        database.setup_tables()
 
 
 def create_application() -> FastAPI:
@@ -28,9 +38,7 @@ def create_application() -> FastAPI:
     immuclient = database_container.immuclient()
     immuclient.login(username=USERNAME, password=PASSWORD)
     database = database_container.database()
-    database.delete()
-    database.create_and_use()
-    database.setup_tables()
+    setup_database(database)
     app = FastAPI()
     # This is after example of dependecy injection framework -> mypy seems to have a problem with this
     app.container = api_container  # type: ignore
@@ -38,6 +46,7 @@ def create_application() -> FastAPI:
     app.include_router(system.router)
     app.include_router(document.router)
     app.include_router(user.router)
+    app.include_router(change.router)
     return app
 
 
